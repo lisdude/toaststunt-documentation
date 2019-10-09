@@ -108,7 +108,7 @@
 @prop #123."toaststunt" {} rc
 ;;#123.("toaststunt") = {"*forward*", "stunt"}
 @prop #123."chr" {} rc
-;;#123.("chr") = {"Syntax:  chr(INT <arg>, ...)  => STR", "", "This function translates integers into ASCII characters. Each argument must be an integer between 0 and 255."}
+;;#123.("chr") = {"Syntax:  chr(INT <arg>, ...)  => STR", "", "This function translates integers into ASCII characters. Each argument must be an integer between 0 and 255.", "If the programmer is not a wizard, and integers less than 32 are provided, E_INVARG is raised. This prevents control characters or newlines from being written to the database file by non-trusted individuals."}
 @prop #123."recycled_objects" {} rc
 ;;#123.("recycled_objects") = {"Syntax:  recycled_objects()  => LIST", "", "Return a list of all invalid objects in the database. An invalid object is one that has been destroyed with the recycle() function."}
 @prop #123."next_recycled_object" {} rc
