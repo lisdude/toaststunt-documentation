@@ -70,6 +70,7 @@ else
         added = setadd(added, property);
       endif
     endif
+    yin();
   endfor
   player:tell("Done! ", ((added == {}) && (updated == {})) ? "No changes found." | tostr("Added: ", $string_utils:english_list(added), ". Updated: ", $string_utils:english_list(updated), "."));
 endif
