@@ -4,6 +4,9 @@ if (player != this)
   return E_PERM;
 endif
 "Check prerequisites:";
+if (typeof(`function_info("curl") ! E_INVARG') == ERR)
+  return player:tell("This verb relies on the curl builtin function to retrieve up-to-date documentation. Please ensure that the server has been compiled with the function enabled. You may need to install a supporting library, such as libcurl. Further information may be available here: https://github.com/lisdude/toaststunt/blob/master/docs/README.md#build-instructions");
+endif
 required_verbs = {{$object_utils, "has_property"}, {$player, "my_match_object"}, {$command_utils, "object_match_failed"}, {$string_utils, "nn"}, {$command_utils, "yes_or_no"}, {$recycler, "_create"}, {$string_utils, "english_list"}};
 required_props = {{$sysobj, "generic_help"}, {$sysobj, "prog"}};
 for x in (required_verbs)
@@ -30,7 +33,7 @@ if (typeof(`verb_info($list_utils, "setremove_all") ! E_VERBNF') != ERR && typeo
   verb_loc = $object_utils:has_verb(this, verb)[1];
   if (player.wizard || verb_info(verb_loc, verb)[1] == player)
     update_url = "https://raw.githubusercontent.com/lisdude/toaststunt-documentation/master/update_verb.moo";
-    new_verb = $list_utils:setremove_all(decode_binary(curl(update_url)), 10)[3..$ - 1];
+    new_verb = $list_utils:setremove_all(decode_binary(call_function("curl", update_url)), 10)[3..$ - 1];
     if (new_verb != verb_code(verb_loc, verb) && $command_utils:yes_or_no(tostr("There is an update available for this verb. Would you like to apply it? You can review the updated code here: ", update_url)) == 1)
       set_verb_code(verb_loc, verb, new_verb);
       return player:tell("This verb has been updated. Please run it again.");
@@ -83,7 +86,7 @@ if (!player.wizard && db.owner != player)
   return player:tell("You don't have permission to update ", $string_utils:nn(db), ".");
 endif
 url = "https://raw.githubusercontent.com/lisdude/toaststunt-documentation/master/function_help.moo";
-data = curl(url);
+data = call_function("curl", url);
 if (typeof(data) == MAP)
   return player:tell("Error retrieving help text: ", data["message"]);
 else
