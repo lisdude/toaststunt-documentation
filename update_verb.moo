@@ -7,7 +7,7 @@ endif
 if (typeof(`function_info("curl") ! E_INVARG') == ERR)
   return player:tell("This verb relies on the curl builtin function to retrieve up-to-date documentation. Please ensure that the server has been compiled with the function enabled. You may need to install a supporting library, such as libcurl. Further information may be available here: https://github.com/lisdude/toaststunt/blob/master/docs/README.md#build-instructions");
 endif
-required_verbs = {{$object_utils, "has_property"}, {$player, "my_match_object"}, {$command_utils, "object_match_failed"}, {$string_utils, "nn"}, {$command_utils, "yes_or_no"}, {$recycler, "_create"}, {$string_utils, "english_list"}};
+required_verbs = {{$object_utils, "has_property"}, {$player, "my_match_object"}, {$command_utils, "object_match_failed"}, {$string_utils, "nn"}, {$command_utils, "yes_or_no"}, {$recycler, "_create"}, {$string_utils, "english_list"}, {$list_utils, "map_builtin"}};
 required_props = {{$sysobj, "generic_help"}, {$sysobj, "prog"}};
 for x in (required_verbs)
   if (typeof(`verb_info(@x) ! E_VERBNF') == ERR)
@@ -92,7 +92,8 @@ if (typeof(data) == MAP)
 else
   regex = "^;;#123\\.\\(\"(?<property>.+)\"\\) = (?<value>.+)$";
   data = decode_binary(data);
-  added = updated = {};
+  added = removed = updated = {};
+  properties = [];
   for x in (data)
     yin();
     if (typeof(x) != STR)
@@ -106,17 +107,30 @@ else
       else
         value = value[2];
       endif
-      if ($object_utils:has_property(db, property))
-        if (db.(property) != value)
-          updated = setadd(updated, property);
-          db.(property) = value;
-        endif
-      else
-        add_property(db, property, value, {db.owner, "rc"});
-        added = setadd(added, property);
+      properties[property] = value;
+    endif
+  endfor
+  "Check for properties that no longer exist in the remote.";
+  for local_prop in (properties(db))
+    yin();
+    if (!maphaskey(properties, local_prop))
+      if ($command_utils:yes_or_no(tostr("The property `", local_prop, "' no longer exists in the remote repository. Do you wish to delete the local version?")) == 1)
+        removed = setadd(removed, local_prop);
+        delete_property(db, local_prop);
       endif
     endif
   endfor
-  player:tell("Done! ", added == {} && updated == {} ? "No changes found." | tostr("Added: ", $string_utils:english_list(added), ". Updated: ", $string_utils:english_list(updated), "."));
+  for value, property in (properties)
+    if ($object_utils:has_property(db, property))
+      if (db.(property) != value)
+        updated = setadd(updated, property);
+        db.(property) = value;
+      endif
+    else
+      add_property(db, property, value, {db.owner, "rc"});
+      added = setadd(added, property);
+    endif
+  endfor
+  player:tell("Done! ", added == {} && updated == {} && removed == {} ? "No changes found." | tostr("Added: ", $string_utils:english_list(added), ". Updated: ", $string_utils:english_list(updated), ".", removed == {} ? "" | tostr(" Removed: ", $string_utils:english_list(removed), ".")));
 endif
 .
