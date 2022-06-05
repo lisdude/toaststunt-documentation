@@ -95,11 +95,11 @@ else
   added = removed = updated = {};
   properties = [];
   for x in (data)
-    yin();
     if (typeof(x) != STR)
       continue;
     endif
     if (match = pcre_match(x, regex))
+      yin();
       {property, value} = {match[1]["property"]["match"], $string_utils:to_value(match[1]["value"]["match"])};
       if (value[1] != 1)
         player:tell("Error parsing value for `", property, "'.");
