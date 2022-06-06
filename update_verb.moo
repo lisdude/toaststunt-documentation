@@ -1,5 +1,9 @@
 @verb $wiz:"@update-toaststunt-help" any any any
 @program $wiz:@update-toaststunt-help
+"Automatically updates ToastStunt documentation to the latest version.";
+"Optional arguments:";
+"   -y: Answer yes to all prompts that update the help database.";
+"   <database>: The name, or object number, of the help database object that you want to update. The verb itself typically finds, or creates, an appropriate database for you, so this argument is generally not necessary.";
 if (player != this)
   return E_PERM;
 endif
@@ -27,6 +31,17 @@ elseif ($object_utils:has_property($sysobj, "help_db") && maphaskey($help_db, "b
 else
   "Not a fatal error, but we won't be able to check our priority";
   builtin_function_help = $failed_match;
+endif
+"In lieu of proper flag parsing, we'll simply look for the only flag(s) we know exist.";
+yes_to_all = 0;
+pcre_yes_match = "\\s?-y\\s?";
+pcre_yes_replacement = tostr("s/", pcre_yes_match, "//g");
+if (args && pcre_match(argstr, pcre_yes_match))
+  yes_to_all = 1;
+  argstr = pcre_replace(argstr, pcre_yes_replacement);
+  if (argstr == "")
+    args = 0;
+  endif
 endif
 "Check if the update verb itself needs updated. (This does its own prerequisite checking because these functions aren't, strictly speaking, required for the main help update to succeed.)";
 if (typeof(`verb_info($list_utils, "setremove_all") ! E_VERBNF') != ERR && typeof(`verb_info($object_utils, "has_verb") ! E_VERBNF') != ERR)
@@ -79,7 +94,7 @@ if (builtin_function_help != $failed_match && db in $prog.help > (builtin_functi
   endif
 endif
 "Finally, actually update the help files.";
-if ($command_utils:yes_or_no(tostr("Do you want to update the help database ", $string_utils:nn(db), "?")) != 1)
+if (!yes_to_all && $command_utils:yes_or_no(tostr("Do you want to update the help database ", $string_utils:nn(db), "?")) != 1)
   return player:tell("Not updating.");
 endif
 if (!player.wizard && db.owner != player)
@@ -114,7 +129,7 @@ else
   for local_prop in (properties(db))
     yin();
     if (!maphaskey(properties, local_prop))
-      if ($command_utils:yes_or_no(tostr("The property `", local_prop, "' no longer exists in the remote repository. Do you wish to delete the local version?")) == 1)
+      if (yes_to_all || $command_utils:yes_or_no(tostr("The property `", local_prop, "' no longer exists in the remote repository. Do you wish to delete the local version?")) == 1)
         removed = setadd(removed, local_prop);
         delete_property(db, local_prop);
       endif
