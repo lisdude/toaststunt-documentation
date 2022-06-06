@@ -114,7 +114,8 @@ else
       continue;
     endif
     if (match = pcre_match(x, regex))
-      yin();
+      "As there's no guarantee that to_value will suspend (and, in the core, it will not), and since we have no way of knowing how many ticks any given help entry will require to parse, we give ourselves the best possible chance of having enough ticks by staring over for each entry. Fortunately, speed is not a requirement.";
+      suspend(0);
       {property, value} = {match[1]["property"]["match"], $string_utils:to_value(match[1]["value"]["match"])};
       if (value[1] != 1)
         player:tell("Error parsing value for `", property, "'.");
