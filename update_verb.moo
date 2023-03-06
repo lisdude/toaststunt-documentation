@@ -48,10 +48,17 @@ if (typeof(`verb_info($list_utils, "setremove_all") ! E_VERBNF') != ERR && typeo
   verb_loc = $object_utils:has_verb(this, verb)[1];
   if (player.wizard || verb_info(verb_loc, verb)[1] == player)
     update_url = "https://raw.githubusercontent.com/lisdude/toaststunt-documentation/master/update_verb.moo";
-    new_verb = $list_utils:setremove_all(decode_binary(call_function("curl", update_url)), 10)[3..$ - 1];
-    if (new_verb != verb_code(verb_loc, verb) && $command_utils:yes_or_no(tostr("There is an update available for this verb. Would you like to apply it? You can review the updated code here: ", update_url)) == 1)
-      set_verb_code(verb_loc, verb, new_verb);
-      return player:tell("This verb has been updated. Please run it again.");
+    downloaded_data = call_function("curl", update_url);
+    if (typeof(downloaded_data) == MAP)
+      player:tell("Update check failed: ", downloaded_data["message"]);
+    elseif (!index(downloaded_data, "@update-toaststunt-help"))
+      player:tell("Update check failed: The update data does not appear to be valid.");
+    else
+      new_verb = $list_utils:setremove_all(decode_binary(downloaded_data), 10)[3..$ - 1];
+      if (new_verb != {} && new_verb != verb_code(verb_loc, verb) && $command_utils:yes_or_no(tostr("There is an update available for this verb. Would you like to apply it? You can review the updated code here: ", update_url)) == 1)
+        set_verb_code(verb_loc, verb, new_verb);
+        return player:tell("This verb has been updated. Please run it again.");
+      endif
     endif
   endif
 endif
