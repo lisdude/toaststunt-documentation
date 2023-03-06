@@ -1,7 +1,11 @@
-# Changelog for LambdaMOO Programming Repository
+# Changelog for toaststunt-documentation repo
+
 ## [1.1.00] - 2023.03.06.23 1:29PM
+* Updated README.md to reflect programmers manual
+* Merged the programmers manual into this repository from its original home https://github.com/sevenecks/lambda-moo-programming
 * Added in connection_info() update
 * Updated to 1.1 as ToastStunt 2.70 released on 03.05.23
+* Updated help to include new connection_info outbound value
 
 ## [1.0.11] - 2022.12.15 3:43PM
 * Added Anatomy of ToastStunt Database link to the Resources section
