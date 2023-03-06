@@ -1,8 +1,8 @@
-This repository contains the [ToastStunt Programmers Manual](toaststunt-programmers-manual.md) as well as documentation for the functions in the [ToastStunt](https://github.com/lisdude/toaststunt) server.
+This repository contains the [ToastStunt Programmers Manual](manual/toaststunt-programmers-manual.md) as well as documentation for the functions in the [ToastStunt](https://github.com/lisdude/toaststunt) server.
 
 ## ToastStunt Programmers Manual
 
-The [ToastStunt Programmers Manual](toaststunt-programmers-manual.md) is an update to the original LambdaMOO Programmer's Manual and the Stunt Programmer's Manual, which includes up-to-date information on everything ToastStunt offers.
+The [ToastStunt Programmers Manual](manual/toaststunt-programmers-manual.md) is an update to the original LambdaMOO Programmer's Manual and the Stunt Programmer's Manual, which includes up-to-date information on everything ToastStunt offers.
 
 ## ToastStunt Help Files
 
