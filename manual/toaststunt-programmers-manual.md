@@ -1,6 +1,6 @@
 # ToastStunt Programmer's Manual Version 1.1.00
 
-## Written for ToastStunt Version 2.7.0, Last Updated 03/06/23
+## Written for ToastStunt Version 2.7.0, Last Updated 03/07/23
 
 by Pavel Curtis et al
 
@@ -22,7 +22,7 @@ Copyright © 2021-2023 By [lisdude](http://github.com/lisdude)
 
 Portions adapted from the [Stunt Programmers Manual](https://lisdude.com/moo/ProgrammersManual.html) by Todd Sundsted Copyright © 2011, 2012, 2013, 2014 by Todd Sundsted.
 
-Portions adapated from the [WAIF documentation](http://ben.com/MOO/waif.html) and [WAIF Programmers Manual](http://ben.com/MOO/waif-progman.html) by Ben Jackson.
+Portions adapted from the [WAIF documentation](http://ben.com/MOO/waif.html) and [WAIF Programmers Manual](http://ben.com/MOO/waif-progman.html) by Ben Jackson.
 
 ([CHANGE LOG](https://github.com/SevenEcks/lambda-moo-programming/blob/master/toast-stunt-programmers-guide/CHANGELOG.md)):
 
@@ -152,7 +152,7 @@ For older versions of this document (or for pre-fork LambdaMOO version) please s
 
 01/08/2022
 
-Hi, I'm Brendan aka Slither. I've been coding in MOO on [Sindome](https://www.sindome.org/) since 2003. I have spent many many hours over the years pouring over the original LambdaMOO programmers manual written by Pavel Curtis. In 2016 I set about updating the original manual with some of my learnings and it wasn't until 2019 that I finished work on it. Around the same time I heard about ToastStunt from [lisdude](https://github.com/lisdude). I wanted to get involved, but sadly, my C/++ coding skills are terrible. Thus, I decided my contribution would be to update the programmers guide to include all the changes that Toast has added, as well as further learnings and feedback from lisdude, DistantOrigin, and othe members of the ToastStunt Discord server.
+Hi, I'm Brendan aka Slither. I've been coding in MOO on [Sindome](https://www.sindome.org/) since 2003. I have spent many many hours over the years pouring over the original LambdaMOO programmers manual written by Pavel Curtis. In 2016 I set about updating the original manual with some of my learnings and it wasn't until 2019 that I finished work on it. Around the same time I heard about ToastStunt from [lisdude](https://github.com/lisdude). I wanted to get involved, but sadly, my C/++ coding skills are terrible. Thus, I decided my contribution would be to update the programmers guide to include all the changes that Toast has added, as well as further learnings and feedback from lisdude, DistantOrigin, and other members of the ToastStunt Discord server.
 
 This guide is not just a technical document, it also contains opinions (mine and others) about what you should (waifs) and shouldn't (anonymous objects, multiple inheritance) consider doing and using. In the end though it's up to you. LambdaMOO and now its successor, ToastStunt, are amazing for creating games, hobby projects, and for tinkering or learning to code. I hope you have some fun!
 
@@ -165,10 +165,10 @@ FileIO, updated and expanded built-ins functions, multiple inheritance, curl sup
 
 * [LambdaMOO & ToastStunt Programming Resources GitHub](https://github.com/SevenEcks/lambda-moo-programming)
 * [Newbie Guide to Compiling ToastStunt](https://lisdude.com/moo/toaststunt_newbie.txt)
-* [lisdude MOO resources](http://www.lisdude.com/moo/)
+* [lisdude MOO Resources](http://www.lisdude.com/moo/)
 * [Unedited Original MOO Programmers Manual](http://www.hayseed.net/MOO/manuals/ProgrammersManual.html)
-* [Older Unedited MOO Programmers Mnaual](http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_toc.html)
-* [ToastStunt Source (github)](https://github.com/lisdude/toaststunt)
+* [Older Unedited MOO Programmers Manual](http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_toc.html)
+* [ToastStunt Source (GitHub)](https://github.com/lisdude/toaststunt)
 * [ToastCore Database Repo](https://github.com/lisdude/toastcore) [ToastCore Datbase File](https://raw.githubusercontent.com/lisdude/toastcore/master/toastcore.db)
 * [MOO Talk Mailing List](https://groups.google.com/forum/#!forum/MOO-talk)
 * [Dome Client Web Socket MOO Client](https://github.com/JavaChilly/dome-client.js)
@@ -269,7 +269,7 @@ MOO strings can be 'indexed into' using square braces and an integer index (much
 "this is a string"[4] -> "s"
 ```
 
-There is syntatic sugar that allows you to do:
+There is syntactic sugar that allows you to do:
 ```
 "Sli" in "Slither"
 ```
@@ -413,7 +413,7 @@ The parent/child hierarchy is used for classifying objects into general classes 
 
 Only the functions `create()`, `recycle()`, `chparent()`, `chparents()`, `renumber()` and `recreate()` can change the parent and children attributes.
 
-Below is the table reprsenting the `flag` for the built-in properties allotted to the object. This is simply a representation of bits, and for example, the player flag is a singular bit (0x01). So the flag is actually an integer that, when in binary, represents all of the flags on the object.
+Below is the table representing the `flag` for the built-in properties allotted to the object. This is simply a representation of bits, and for example, the player flag is a singular bit (0x01). So the flag is actually an integer that, when in binary, represents all of the flags on the object.
 
 ```
 Player:         0x01    set_player_flag()
@@ -503,19 +503,19 @@ The final kind of piece making up an object is _verbs_. A verb is a named MOO pr
 
 It is also possible for MOO programs to invoke the verbs defined on objects. Some verbs, in fact, are designed to be used only from inside MOO code; they do not correspond to any particular player command at all. Thus, verbs in MOO are like the _procedures_ or _methods_ found in some other programming languages.
 
-> Note: There are even more ways to refer to _verbs_ and their counterparts in other programming language: _procedure_, _function_, _subroutine_, _subprogram_, and _method_ are the primary onces. However, in _Object Oriented Programming_ abbreviated _OOP_ you may primarily know them as methods.
+> Note: There are even more ways to refer to _verbs_ and their counterparts in other programming language: _procedure_, _function_, _subroutine_, _subprogram_, and _method_ are the primary ones. However, in _Object Oriented Programming_ abbreviated _OOP_ you may primarily know them as methods.
 
 As with properties, every verb has an owner and a set of permission bits. The owner of a verb can change its program, its permission bits, and its argument specifiers (discussed below). Only a wizard can change the owner of a verb.
 
 The owner of a verb also determines the permissions with which that verb runs; that is, the program in a verb can do whatever operations the owner of that verb is allowed to do and no others. Thus, for example, a verb owned by a wizard must be written very carefully, since wizards are allowed to do just about anything.
 
-> Warning: This is serious business. The MOO has a variety of checks in place for permissions (at the object, verb and property levels) that are all but ignored when a verb is executing with a wizard's permisisons. You may want to create a non-wizard character and give them the programmer bit, and write much of your code there, leaving the wizard bit for things that actually require access to everything, despite permissions.
+> Warning: This is serious business. The MOO has a variety of checks in place for permissions (at the object, verb and property levels) that are all but ignored when a verb is executing with a wizard's permissions. You may want to create a non-wizard character and give them the programmer bit, and write much of your code there, leaving the wizard bit for things that actually require access to everything, despite permissions.
 
 | Permission Bit  | Description |
 | ------------- | ------------- |
 | r (read) | Let non-owners see the verb code |
 | w (write) | Let non-owners write the verb code |
-| x (execute) | Let verb be invokved from within another verb |
+| x (execute) | Let verb be invoked from within another verb |
 | d (debug) | Let the verb raise errors to be caught |
 
 The permission bits on verbs are drawn from this set: `r` (read), `w` (write), `x` (execute), and `d` (debug). Read permission lets non-owners see the program for a verb and, symmetrically, write permission lets them change that program. The other two bits are not, properly speaking, permission bits at all; they have a universal effect, covering both the owner and non-owners.
@@ -571,7 +571,7 @@ To have any of this make real sense, it is important to understand precisely how
 
 But first, we mention the three situations in which a line typed by a player is not treated as an ordinary command:
 
-1. The line may exactly match the connection`s defined flush command, if any (`.flush` by default), in which case all pending lines of input are cleared and nothing further is done with the flush command itself. Likewise, any line may be flushed by a subsequent flush command before the server otherwise gets a chance to process it. For more on this, see Flushing Unprocessed Input.
+1. The line may exactly match the connection's defined flush command, if any (`.flush` by default), in which case all pending lines of input are cleared and nothing further is done with the flush command itself. Likewise, any line may be flushed by a subsequent flush command before the server otherwise gets a chance to process it. For more on this, see Flushing Unprocessed Input.
 2. The line may begin with a prefix that qualifies it for out-of-band processing and thence, perhaps, as an out-of-band command. For more on this, see Out-of-band Processing.
 3. The connection may be subject to a read() call (see section Operations on Network Connections) or there may be a .program command in progress (see section The .program Command), either of which will consume the line accordingly. Also note that if connection option "hold-input" has been set, all in-band lines typed by the player are held at this point for future reading, even if no reading task is currently active. 
 
@@ -636,7 +636,7 @@ The next step is to try to find MOO objects that are named by the direct and ind
 
 First, if an object string is empty, then the corresponding object is the special object `#-1` (aka `$nothing` in ToastCore). If an object string has the form of an object number (i.e., a hash mark (`#`) followed by digits), and the object with that number exists, then that is the named object. If the object string is either `"me"` or `"here"`, then the player object itself or its location is used, respectively.
 
-> Note: $nothing is considered a `corified` object.  This means that a _property_ has been created on `#0` named `nothing` with the value of `#-1`. For example (after creating the property): `;#0.nothing = #-1` This allows you to reference the `#-1` object via it's corified reference of `$nothing`. In practice this can be very useful as you can use corified references in your code (and should!) instead of object numbers. Among other benefits this allows you to write your code (which references other objects) once and then swap out the corified reference, pointing to a different object. For instance if you have a new errror logging system and you want to replace the old $error_logger reference with your new one, you wont have to find all the references to the old error logger object number in your code. You can just change the property on `#0` to reference the new object.  
+> Note: $nothing is considered a `corified` object.  This means that a _property_ has been created on `#0` named `nothing` with the value of `#-1`. For example (after creating the property): `;#0.nothing = #-1` This allows you to reference the `#-1` object via it's corified reference of `$nothing`. In practice this can be very useful as you can use corified references in your code (and should!) instead of object numbers. Among other benefits this allows you to write your code (which references other objects) once and then swap out the corified reference, pointing to a different object. For instance if you have a new error logging system and you want to replace the old $error_logger reference with your new one, you wont have to find all the references to the old error logger object number in your code. You can just change the property on `#0` to reference the new object.  
 
 Otherwise, the server considers all of the objects whose location is either the player (i.e., the objects the player is "holding", so to speak) or the room the player is in (i.e., the objects in the same room as the player); it will try to match the object string against the various names for these objects.
 
@@ -986,8 +986,7 @@ Note that integers and floating-point numbers are never equal to one another, ev
 
 > Warning: It is easy (and very annoying) to confuse the equality-testing operator (`==`) with the assignment operator (`=`), leading to nasty, hard-to-find bugs. Don't do this.
 
-> Warning: Comparing floating point numbers for equality can be tricky. Sometimes two floating point numbers will appear the same but be rounded up or down at some meaningfuly bit, and thus will not be exactly equal. This is especially true when comparing a number in memory (assigned to a variable) to a number that is formed from reading a value from a player, or pulled from a property. Be wary of this, if you ever encounter it, as it can be
-    tediuous to debug.
+> Warning: Comparing floating point numbers for equality can be tricky. Sometimes two floating point numbers will appear the same but be rounded up or down at some meaningful bit, and thus will not be exactly equal. This is especially true when comparing a number in memory (assigned to a variable) to a number that is formed from reading a value from a player, or pulled from a property. Be wary of this, if you ever encounter it, as it can be tedious to debug.
 
 Integers, floats, object numbers, strings, and error values can also be compared for ordering purposes using the following operators:
 
@@ -1027,7 +1026,7 @@ All other values are false:
 * the floating-point numbers `0.0` and `-0.0`
 * the empty string (`""`)
 * the empty list (`{}`)
-* all object numbers & object refewrences
+* all object numbers & object references 
 * all error values
 * the bool 'false'
 
@@ -1043,7 +1042,7 @@ The conditional expression in MOO has the following form:
 expression-1 ? expression-2 | expression-3
 ```
 
-> Note: This is commonly refered to as a ternary statement in most programming languages. In MOO the commonly used ! is replaced with a |.
+> Note: This is commonly referred to as a ternary statement in most programming languages. In MOO the commonly used ! is replaced with a |.
 
 First, expression-1 is evaluated. If it returns a true value, then expression-2 is evaluated and whatever it returns is returned as the value of the conditional expression as a whole. If expression-1 returns a false value, then expression-3 is evaluated instead and its value is used as that of the conditional expression.
 
@@ -1242,7 +1241,7 @@ If the low index is greater than the high index, then the empty string, list or 
 
 ##### Replacing a Subsequence of a List, Map or String
 
-The subrange assigment replaces a specified subsequence of a list, map or string with a supplied subsequence. The allowed forms are:
+The subrange assignment replaces a specified subsequence of a list, map or string with a supplied subsequence. The allowed forms are:
 
 ```
 variable[start-index-expr..end-index-expr] = result-expr
@@ -1251,11 +1250,11 @@ object-expr.(name-expr)[start-index-expr..end-index-expr] = result-expr
 $name[start-index-expr..end-index-expr] = result-expr
 ```
 
-As with indexed assigments, the first form writes into a variable, and the last three forms write into a property. The same errors (`E_TYPE`, `E_INVIND`, `E_PROPNF` and `E_PERM` for lack of read/write permission on the property) may be raised. If variable does not yet have a value (i.e., it has never been assigned to), `E_VARNF` will be raised. As before, the `^` and `$` expression can be used in either start-index-expr or end-index-expr.
+As with indexed assignments, the first form writes into a variable, and the last three forms write into a property. The same errors (`E_TYPE`, `E_INVIND`, `E_PROPNF` and `E_PERM` for lack of read/write permission on the property) may be raised. If variable does not yet have a value (i.e., it has never been assigned to), `E_VARNF` will be raised. As before, the `^` and `$` expression can be used in either start-index-expr or end-index-expr.
 
 If start-index-expr or end-index-expr is not an integer (for lists and strings) or a collection value (for maps), if the value of variable or the property is not a list, map, or string, or result-expr is not the same type as variable or the property, `E_TYPE` is raised. For lists and strings, `E_RANGE` is raised if end-index-expr is less than zero or if start-index-expr is greater than the length of the list or string plus one. Note: the length of result-expr does not need to be the same as the length of the specified range. For maps, `E_RANGE` is raised if `start-index-expr` or `end-index-expr` are not keys in the map.
 
-In precise terms, the subrange assigment
+In precise terms, the subrange assignment 
 
 ```
 v[start..end] = value
@@ -1277,9 +1276,9 @@ if v is a string.
 
 There is no literal representation of the operation if v is a map. In this case the range given by start-index-expr and end-index-expr is removed, and the the values in result-expr are added.
 
-The assigment expression itself returns the value of result-expr.
+The assignment expression itself returns the value of result-expr.
 
-> Note: The use of preceeding a list with the @ symbol is covered in just a bit.
+> Note: The use of preceding a list with the @ symbol is covered in just a bit.
 
 For the following examples, assume that `l` initially contains the list `{1, 2, 3}`, that `m` initially contains the map [1 -> "one", 2 -> "two", 3 -> "three"] and that `s` initially contains the string "foobar":
 
@@ -1384,9 +1383,9 @@ where each target describes a place to store elements of the list that results f
 | Target  | Description |
 | ------------- | ------------- |
 | <code>variable</code> | This is the simplest target, just a simple variable; the list element in the corresponding position is assigned to the variable. This is called a <em>required</em> target, since the assignment is required to put one of the list elements into the variable. |
-| <code>?variable</code> | This is called an <em>optional</em> target, since it doesn&apos;t always get assigned an element. If there are any list elements left over after all of the required targets have been accounted for (along with all of the other optionals to the left of this one), then this variable is treated like a required one and the list element in the corresponding position is assigned to the variable. If there aren&apos;t enough elements to assign one to this target, then no assignment is made to this variable, leaving it with whatever its previous value was. |
-| <code>?variable = default-expr</code> | This is also an optional target, but if there aren&apos;t enough list elements available to assign one to this target, the result of evaluating default-expr is assigned to it instead. Thus, default-expr provides a <em>default value</em> for the variable. The default value expressions are evaluated and assigned working from left to right <em>after</em> all of the other assignments have been performed. |
-| <code>@variable</code> | By analogy with the <code>@</code> syntax in list construction, this variable is assigned a list of all of the &apos;leftover&apos; list elements in this part of the list after all of the other targets have been filled in. It is assigned the empty list if there aren&apos;t any elements left over. This is called a <em>rest</em> target, since it gets the rest of the elements. There may be at most one rest target in each scattering assignment expression. |
+| <code>?variable</code> | This is called an <em>optional</em> target, since it doesn't always get assigned an element. If there are any list elements left over after all of the required targets have been accounted for (along with all of the other optionals to the left of this one), then this variable is treated like a required one and the list element in the corresponding position is assigned to the variable. If there aren't enough elements to assign one to this target, then no assignment is made to this variable, leaving it with whatever its previous value was. |
+| <code>?variable = default-expr</code> | This is also an optional target, but if there aren't enough list elements available to assign one to this target, the result of evaluating default-expr is assigned to it instead. Thus, default-expr provides a <em>default value</em> for the variable. The default value expressions are evaluated and assigned working from left to right <em>after</em> all of the other assignments have been performed. |
+| <code>@variable</code> | By analogy with the <code>@</code> syntax in list construction, this variable is assigned a list of all of the 'leftover' list elements in this part of the list after all of the other targets have been filled in. It is assigned the empty list if there aren't any elements left over. This is called a <em>rest</em> target, since it gets the rest of the elements. There may be at most one rest target in each scattering assignment expression. |
 
 If there aren't enough list elements to fill all of the required targets, or if there are more than enough to fill all of the required and optional targets but there isn't a rest target to take the leftover ones, then `E_ARGS` is raised.
 
@@ -1411,7 +1410,7 @@ me:foo(1, 2, 3, 4, 5, 6, 7)      =>   {1, 2, 3, {4, 5}, 6, 7}
 me:foo(1, 2, 3, 4, 5, 6, 7, 8)   =>   {1, 2, 3, {4, 5, 6}, 7, 8}
 ```
 
-Using scattering assignment, the example at the begining of this section could be rewritten more simply, reliably, and readably:
+Using scattering assignment, the example at the beginning of this section could be rewritten more simply, reliably, and readably:
 
 ```
 {first, second, ?third = 0} = args;
@@ -1551,7 +1550,7 @@ The server supports verbs calls on primitive types (numbers, strings, etc.) so c
 
 This also includes supporting calling verbs on an object prototype ($obj_proto). Counterintuitively, this will only work for types of OBJ that are invalid. This can come in useful for un-logged-in connections (i.e. creating a set of convenient utilities for dealing with negative connections in-MOO).
 
-> Fine Point: Utilizing verbs on primitives is a matter of style. Some people like it, some people don't. The author suggests you keep a uility object (like $string_utils) and simply forward verb calls from your primitive to this utility, which keeps backwards compatibility with how ToastCore and LambdaCore are generally built. By default in ToastCore, the primatives just wrap around their `type`_utils counterparts.
+> Fine Point: Utilizing verbs on primitives is a matter of style. Some people like it, some people don't. The author suggests you keep a utility object (like $string_utils) and simply forward verb calls from your primitive to this utility, which keeps backwards compatibility with how ToastCore and LambdaCore are generally built. By default in ToastCore, the primitives just wrap around their `type`_utils counterparts.
 
 #### Catching Errors in Expressions
 
@@ -1952,7 +1951,7 @@ endfor
 
 The verb above could be called with `obj_with_verb:has_object(#18657, {#1, #3, #4, #3000})` and it would return `false` (0) if the object was not found in the list. It would return `true` (1) if the object was found in the list.
 
-Of course we could write this much simplier (and get the index of the object in the list at the same time):
+Of course we could write this much more simply (and get the index of the object in the list at the same time):
 
 ```
 {seek_obj, list_of_objects} = args;
@@ -2055,7 +2054,7 @@ endtry
 
 First, statements-1 is executed; if it completes without raising an error, returning from this verb, or terminating the current iteration of a surrounding loop (we call these possibilities _transferring control_), then statements-2 is executed and that's all that happens for the entire `try`-`finally` statement.
 
-Otherwise, the process of transferring control is interrupted and statments-2 is executed. If statements-2 itself completes without transferring control, then the interrupted control transfer is resumed just where it left off. If statements-2 does transfer control, then the interrupted transfer is simply forgotten in favor of the new one.
+Otherwise, the process of transferring control is interrupted and statements-2 is executed. If statements-2 itself completes without transferring control, then the interrupted control transfer is resumed just where it left off. If statements-2 does transfer control, then the interrupted transfer is simply forgotten in favor of the new one.
 
 In short, this statement ensures that statements-2 is executed after control leaves statements-1 for whatever reason; it can thus be used to make sure that some piece of cleanup code is run even if statements-1 doesn't simply run normally to completion.
 
@@ -2098,7 +2097,7 @@ endfork
 
 then that variable is assigned the _task ID_ of the newly-created task.  The value of this variable is visible both to the task executing the fork statement and to the statements in the newly-created task. This ID can be passed to the `kill_task()` function to keep the task from running and will be the value of `task_id()` once the task begins execution.
 
-> Note: This feature has other uses as well. The MOO is single threaded (though ToastStunt supports some built-ins executing on other threads), which means that complex logic (verbs that call verbs that call verbs ...) can cause the MOO to _lag_. For instance, let's say when your user tosses their ball up, you want to calculate a complex trejectory involve the ball and other objects in the room. These calculations are costly and done in another verb, they take time to be performed. However, you want some actions to happen both before the calculations (everyone in the room seeing the ball is thrown into the air) and after the ball has left the players hands (the player reaches into their pocket and pulls out a new ball). If there is no `fork()` then the calculations need to complete before the verb can continue execution, which means the player won't pull out a fresh ball until after the calculations are complete. A `fork()` allows the player to throw the ball, the MOO to `fork()` the task, which allows execution of the verb to continue right away and the user to pull out a new ball, without experiencing the delay that the calculations being returned (without a `fork()`) would have inccured.
+> Note: This feature has other uses as well. The MOO is single threaded (though ToastStunt supports some built-ins executing on other threads), which means that complex logic (verbs that call verbs that call verbs ...) can cause the MOO to _lag_. For instance, let's say when your user tosses their ball up, you want to calculate a complex trajectory involve the ball and other objects in the room. These calculations are costly and done in another verb, they take time to be performed. However, you want some actions to happen both before the calculations (everyone in the room seeing the ball is thrown into the air) and after the ball has left the players hands (the player reaches into their pocket and pulls out a new ball). If there is no `fork()` then the calculations need to complete before the verb can continue execution, which means the player won't pull out a fresh ball until after the calculations are complete. A `fork()` allows the player to throw the ball, the MOO to `fork()` the task, which allows execution of the verb to continue right away and the user to pull out a new ball, without experiencing the delay that the calculations being returned (without a `fork()`) would have incurred.
 
 An example of this:
 
@@ -2256,7 +2255,7 @@ A WAIF's properties and behavior are a hybrid of several existing MOO types. It 
 - You can call verbs and reference properties on WAIFs. These are inherited from its class object (with the mapping described below).
 - WAIFs are cheap to create, about the same as LISTs.
 - WAIFs are small. A WAIF with all clear properties (like right after it is created) is only a few bytes longer than a LIST big enough to hold {class, owner}. If you assign a value to a property it grows the same amount a LIST would if you appended a value to it.
-- WAIF property acesses are controlled like OBJ property accesses. Having a reference to a WAIF doesn't mean you can see what's inside it.
+- WAIF property accesses are controlled like OBJ property accesses. Having a reference to a WAIF doesn't mean you can see what's inside it.
 - WAIFs can never define new verbs or properties.
 - WAIFs can never have any children.
 - WAIFs can't change class or ownership.
@@ -3352,7 +3351,7 @@ str `string_hash` (str string, [, algo [, binary]])
 
 str `binary_hash` (str bin-string, [, algo [, binary])
 
- If algo is provided, it specifies the hashing algorithm to use. "MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512" and "RIPEMD160" are all supported. If binary is provided and true, the result is in MOO binary string format; by default the result is a hexidecimal string.
+ If algo is provided, it specifies the hashing algorithm to use. "MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512" and "RIPEMD160" are all supported. If binary is provided and true, the result is in MOO binary string format; by default the result is a hexadecimal string.
 
 Note that the MD5 hash algorithm is broken from a cryptographic standpoint, as is SHA1. Both are included for interoperability with existing applications (both are still popular).
 
@@ -3374,7 +3373,7 @@ str `string_hmac` (str text, str key [, str algo [, binary]])
 
 str binary_hmac (str bin-string, str key [, str algo [, binary]])
 
-Returns a string encoding the result of applying the HMAC-SHA256 cryptographically secure HMAC function to the contents of the string text or the binary string bin-string with the specified secret key. If algo is provided, it specifies the hashing algorithm to use. Currently, only "SHA1" and "SHA256" are supported. If binary is provided and true, the result is in MOO binary string format; by default the result is a hexidecimal string.
+Returns a string encoding the result of applying the HMAC-SHA256 cryptographically secure HMAC function to the contents of the string text or the binary string bin-string with the specified secret key. If algo is provided, it specifies the hashing algorithm to use. Currently, only "SHA1" and "SHA256" are supported. If binary is provided and true, the result is in MOO binary string format; by default the result is a hexadecimal string.
 
 All cryptographically secure HMACs have the property that, if
 
@@ -3639,7 +3638,7 @@ obj `create` (obj parent [, obj owner] [, int anon-flag] [, list init-args])
 
 obj `create` (list parents [, obj owner] [, int anon-flag] [, list init-args])
 
-Creates and returns a new object whose parents are parents (or whose parent is parent) and whose owner is as described below. If any of the given parents are not valid, or if the given parent is neither valid nor #-1, then E_INVARG is raised. The given parents objects must be valid and must be usable as a parent (i.e., their `a` or `f` bits must be true) or else the programmer must own parents or be a wizard; otherwise E_PERM is raised. Futhermore, if anon-flag is true then `a` must be true; and, if anon-flag is false or not present, then `f` must be true. Otherwise, E_PERM is raised unless the programmer owns parents or is a wizard. E_PERM is also raised if owner is provided and not the same as the programmer, unless the programmer is a wizard. 
+Creates and returns a new object whose parents are parents (or whose parent is parent) and whose owner is as described below. If any of the given parents are not valid, or if the given parent is neither valid nor #-1, then E_INVARG is raised. The given parents objects must be valid and must be usable as a parent (i.e., their `a` or `f` bits must be true) or else the programmer must own parents or be a wizard; otherwise E_PERM is raised. Furthermore, if anon-flag is true then `a` must be true; and, if anon-flag is false or not present, then `f` must be true. Otherwise, E_PERM is raised unless the programmer owns parents or is a wizard. E_PERM is also raised if owner is provided and not the same as the programmer, unless the programmer is a wizard. 
 
 After the new object is created, its initialize verb, if any, is called. If init-args were given, they are passed as args to initialize. The new object is assigned the least non-negative object number that has not yet been used for a created object. Note that no object number is ever reused, even if the object with that number is recycled.
 
@@ -4148,7 +4147,7 @@ Granting MOO code direct access to files opens a hole in the otherwise fairly go
 
 > Warning: The FileIO code looks for a 'files' directory in the same directory as the MOO executable. This directory must exist for your code to work.
 
-> Note: More detailed information regarding the FileIO code can be found in the docs/FileioDocts.txt folder of the ToastStunt repo.
+> Note: More detailed information regarding the FileIO code can be found in the docs/FileioDocs.txt folder of the ToastStunt repo.
 
 The FileIO system has been updated in ToastCore and includes a number of enhancements over earlier LambdaMOO and Stunt versions.
 * Faster reading
@@ -4734,7 +4733,7 @@ none `notify` (obj conn, str string [, INT no-flush [, INT suppress-newline])
 
 If the programmer is not conn or a wizard, then `E_PERM` is raised. If conn is not a currently-active connection, then this function does nothing. Output is normally written to connections only between tasks, not during execution.
 
-The server will not queue an arbitrary amount of output for a connection; the `MAX_QUEUED_OUTPUT` compilation option (in `options.h`) controls the limit (`MAX_QUEUED_OUTPUT` can be overridden in-database by adding the property `$server_options.max_queued_output` and calling `load_server_options()`). When an attempt is made to enqueue output that would take the server over its limit, it first tries to write as much output as possible to the connection without having to wait for the other end. If that doesn't result in the new output being able to fit in the queue, the server starts throwing away the oldest lines in the queue until the new ouput will fit. The server remembers how many lines of output it has 'flushed' in this way and, when next it can succeed in writing anything to the connection, it first writes a line like `>> Network buffer overflow: X lines of output to you have been lost <<` where X is the number of flushed lines.
+The server will not queue an arbitrary amount of output for a connection; the `MAX_QUEUED_OUTPUT` compilation option (in `options.h`) controls the limit (`MAX_QUEUED_OUTPUT` can be overridden in-database by adding the property `$server_options.max_queued_output` and calling `load_server_options()`). When an attempt is made to enqueue output that would take the server over its limit, it first tries to write as much output as possible to the connection without having to wait for the other end. If that doesn't result in the new output being able to fit in the queue, the server starts throwing away the oldest lines in the queue until the new output will fit. The server remembers how many lines of output it has 'flushed' in this way and, when next it can succeed in writing anything to the connection, it first writes a line like `>> Network buffer overflow: X lines of output to you have been lost <<` where X is the number of flushed lines.
 
 If no-flush is provided and true, then `notify()` never flushes any output from the queue; instead it immediately returns false. `Notify()` otherwise always returns true.
 
@@ -4941,7 +4940,7 @@ set_connection_option(
             "PREFIX"));
 ```
 
-Note that connection_options() with no second argument will return a list while passing in the second argument will return the value of the key requsted.
+Note that connection_options() with no second argument will return a list while passing in the second argument will return the value of the key requested.
 
 ```
 save = connection_options(player,"intrinsic-commands");
@@ -5100,7 +5099,7 @@ Each element of the list has the following form:
 
 where object is the first argument given in the call to `listen()` to create this listening point, print-messages is true if the third argument in that call was provided and true, and canon was the value returned by that call. (For the initial listening point, object is `#0`, canon is determined by the command-line arguments or a network-configuration-specific default, and print-messages is true.)
 
-Please note that there is nothing special about the initial listening point created by the server when it starts; you can use `unlisten()` on it just as if it had been created by `listen()`. This can be useful; for example, under one of the TCP/IP configurations, you might start up your server on some obscure port, say 12345, connect to it by yourself for a while, and then open it up to normal users by evaluating the statments:
+Please note that there is nothing special about the initial listening point created by the server when it starts; you can use `unlisten()` on it just as if it had been created by `listen()`. This can be useful; for example, under one of the TCP/IP configurations, you might start up your server on some obscure port, say 12345, connect to it by yourself for a while, and then open it up to normal users by evaluating the statements:
 
 ```
 unlisten(12345); listen(#0, 7777, 1)
@@ -5239,7 +5238,7 @@ If the currently-executing verb was not called by another verb (i.e., it is the 
 
 **Function: `set_task_local`**
 
-set_task_loca -- Sets a value that gets associated with the current running task. 
+set_task_local -- Sets a value that gets associated with the current running task. 
 
 void set_task_local(ANY value)
 
@@ -6089,7 +6088,7 @@ The `recycle()` function increases the quota by one and stores it back into the 
 
 ### Object Movement
 
-Vuring evaluation of a call to the `move()` function, the server can make calls on the `accept` and `enterfunc` verbs defined on the destination of the move and on the `exitfunc` verb defined on the source.  The rules and circumstances are somewhat complicated and are given in detail in the description of the `move()` function.
+During evaluation of a call to the `move()` function, the server can make calls on the `accept` and `enterfunc` verbs defined on the destination of the move and on the `exitfunc` verb defined on the source.  The rules and circumstances are somewhat complicated and are given in detail in the description of the `move()` function.
 
 ### Temporarily Enabling Obsolete Server Features
 

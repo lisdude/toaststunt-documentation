@@ -1,5 +1,7 @@
+## [1.1.1] - 2023.03.07 12:43AM
+* Corrected typos.
 
-## [1.1.00] - 2023.03.06.23 1:29PM
+## [1.1.0] - 2023.03.06 1:29PM
 * Updated README.md to reflect programmers manual
 * Merged the programmers manual into this repository from its original home https://github.com/sevenecks/lambda-moo-programming
 * Added in connection_info() update
