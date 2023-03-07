@@ -331,27 +331,27 @@ We will go into more detail on WAIFs in the [Working with WAIFs](#working-with-w
 
 _Errors_ are, by far, the least frequently used values in MOO. In the normal case, when a program attempts an operation that is erroneous for some reason (for example, trying to add a number to a character string), the server stops running the program and prints out an error message. However, it is possible for a program to stipulate that such errors should not stop execution; instead, the server should just let the value of the operation be an error value. The program can then test for such a result and take some appropriate kind of recovery action. In programs, error values are written as words beginning with `E_`. The complete list of error values, along with their associated messages, is as follows:
 
-| Error | Description |
-| ------------- | ------------- |
-| E_NONE | No error |
-| E_TYPE | Type mismatch |
-| E_DIV | Division by zero |
-| E_PERM | Permission denied |
-| E_PROPNF | Property not found |
-| E_VERBNF | Verb not found |
-| E_VARNF | Variable not found |
-| E_INVIND | Invalid indirection |
-| E_RECMOVE | Recursive move |
-| E_MAXREC | Too many verb calls |
-| E_RANGE | Range error |
-| E_ARGS | Incorrect number of arguments |
-| E_NACC | Move refused by destination |
-| E_INVARG | Invalid argument |
-| E_QUOTA | Resource limit exceeded |
-| E_FLOAT | Floating-point arithmetic error |
-| E_FILE | File system error |
-| E_EXEC | Exec error |
-| E_INTRPT | Interrupted |
+| Error     | Description                     |
+| --------- | ------------------------------- |
+| E_NONE    | No error                        |
+| E_TYPE    | Type mismatch                   |
+| E_DIV     | Division by zero                |
+| E_PERM    | Permission denied               |
+| E_PROPNF  | Property not found              |
+| E_VERBNF  | Verb not found                  |
+| E_VARNF   | Variable not found              |
+| E_INVIND  | Invalid indirection             |
+| E_RECMOVE | Recursive move                  |
+| E_MAXREC  | Too many verb calls             |
+| E_RANGE   | Range error                     |
+| E_ARGS    | Incorrect number of arguments   |
+| E_NACC    | Move refused by destination     |
+| E_INVARG  | Invalid argument                |
+| E_QUOTA   | Resource limit exceeded         |
+| E_FLOAT   | Floating-point arithmetic error |
+| E_FILE    | File system error               |
+| E_EXEC    | Exec error                      |
+| E_INTRPT  | Interrupted                     |
 
 #### List Type
 
@@ -433,19 +433,19 @@ Recycled:       0x400   <destroy anonymous object and call recycle verb>
 
 A _property_ is a named "slot" in an object that can hold an arbitrary MOO value. Every object has eleven built-in properties whose values are constrained to be of particular types. In addition, an object can have any number of other properties, none of which have type constraints. The built-in properties are as follows:
 
-| Property  | Description |
-| ------------- | ------------- |
-| name | a string, the usual name for this object |
-| owner | an object, the player who controls access to it |
-| location | an object, where the object is in virtual reality |
-| contents | a list of objects, the inverse of location |
-| last_move | a map of an object's last location and the time() it moved |
-| programmer | a bit, does the object have programmer rights? |
-| wizard | a bit, does the object have wizard rights? |
-| r | a bit, is the object publicly readable? |
-| w | a bit, is the object publicly writable? |
-| f | a bit, is the object fertile? |
-| a | a bit, can this be a parent of anonymous objects? |
+| Property   | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| name       | a string, the usual name for this object                   |
+| owner      | an object, the player who controls access to it            |
+| location   | an object, where the object is in virtual reality          |
+| contents   | a list of objects, the inverse of location                 |
+| last_move  | a map of an object's last location and the time() it moved |
+| programmer | a bit, does the object have programmer rights?             |
+| wizard     | a bit, does the object have wizard rights?                 |
+| r          | a bit, is the object publicly readable?                    |
+| w          | a bit, is the object publicly writable?                    |
+| f          | a bit, is the object fertile?                              |
+| a          | a bit, can this be a parent of anonymous objects?          |
 
 The `name` property is used to identify the object in various printed messages. It can only be set by a wizard or by the owner of the object. For player objects, the `name` property can only be set by a wizard; this allows the wizards, for example, to check that no two players have the same name.
 
@@ -481,11 +481,11 @@ The initial owner of a property is the player who added it; this is usually, but
 
 The permissions on properties are drawn from this set: 
 
-| Permission Bit  | Description |
-| ------------- | ------------- |
-| `r` | Read permission lets non-owners get the value of the property |
-| `w` | Write permission lets non-owners set the property value | 
-| `c` | Change ownership in descendants | 
+| Permission Bit | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| `r`            | Read permission lets non-owners get the value of the property |
+| `w`            | Write permission lets non-owners set the property value       |
+| `c`            | Change ownership in descendants                               |
 
 The `c` bit is a bit more complicated. Recall that every object has all of the properties that its parent does and perhaps some more. Ordinarily, when a child object inherits a property from its parent, the owner of the child becomes the owner of that property. This is because the `c` permission bit is "on" by default. If the `c` bit is not on, then the inherited property has the same owner in the child as it does in the parent.
 
@@ -511,12 +511,12 @@ The owner of a verb also determines the permissions with which that verb runs; t
 
 > Warning: This is serious business. The MOO has a variety of checks in place for permissions (at the object, verb and property levels) that are all but ignored when a verb is executing with a wizard's permissions. You may want to create a non-wizard character and give them the programmer bit, and write much of your code there, leaving the wizard bit for things that actually require access to everything, despite permissions.
 
-| Permission Bit  | Description |
-| ------------- | ------------- |
-| r (read) | Let non-owners see the verb code |
-| w (write) | Let non-owners write the verb code |
-| x (execute) | Let verb be invoked from within another verb |
-| d (debug) | Let the verb raise errors to be caught |
+| Permission Bit | Description                                  |
+| -------------- | -------------------------------------------- |
+| r (read)       | Let non-owners see the verb code             |
+| w (write)      | Let non-owners write the verb code           |
+| x (execute)    | Let verb be invoked from within another verb |
+| d (debug)      | Let the verb raise errors to be caught       |
 
 The permission bits on verbs are drawn from this set: `r` (read), `w` (write), `x` (execute), and `d` (debug). Read permission lets non-owners see the program for a verb and, symmetrically, write permission lets them change that program. The other two bits are not, properly speaking, permission bits at all; they have a universal effect, covering both the owner and non-owners.
 
@@ -529,23 +529,23 @@ The setting of the debug bit determines what happens when the verb's program doe
 
 In addition to an owner and some permission bits, every verb has three _argument specifiers_, one each for the `direct object`, the `preposition`, and the `indirect object`. The direct and indirect specifiers are each drawn from this set: `this`, `any`, or `none`. The preposition specifier is `none`, `any`, or one of the items in this list:
 
-| Preposition |
-| ------------- |
-| with/using |
-| at/to |
-| in front of |
-| in/inside/into |
-| on top of/on/onto/upon |
-| out of/from inside/from |
-| over |
-| through |
+| Preposition              |
+| ------------------------ |
+| with/using               |
+| at/to                    |
+| in front of              |
+| in/inside/into           |
+| on top of/on/onto/upon   |
+| out of/from inside/from  |
+| over                     |
+| through                  |
 | under/underneath/beneath |
-| behind |
-| beside |
-| for/about |
-| is |
-| as |
-| off/off of |
+| behind                   |
+| beside                   |
+| for/about                |
+| is                       |
+| as                       |
+| off/off of               |
 
 The argument specifiers are used in the process of parsing commands, described in the next chapter.
 
@@ -673,19 +673,19 @@ So, the server considers several objects in turn, checking each of their verbs i
 
 At long last, we have a program to run in response to the command typed by the player. When the code for the program begins execution, the following built-in variables will have the indicated values:
 
-| Variable  | Value |
-| ------------- | ------------- |
-| player | an object, the player who typed the command |
-| this | an object, the object on which this verb was found |
-| caller | an object, the same as <code>player</code> |
-| verb | a string, the first word of the command |
-| argstr | a string, everything after the first word of the command |
-| args | a list of strings, the words in <code>argstr</code> |
-| dobjstr | a string, the direct object string found during parsing |
-| dobj | an object, the direct object value found during matching |
-| prepstr | a string, the prepositional phrase found during parsing |
-| iobjstr | a string, the indirect object string |
-| iobj | an object, the indirect object value |
+| Variable | Value                                                    |
+| -------- | -------------------------------------------------------- |
+| player   | an object, the player who typed the command              |
+| this     | an object, the object on which this verb was found       |
+| caller   | an object, the same as <code>player</code>               |
+| verb     | a string, the first word of the command                  |
+| argstr   | a string, everything after the first word of the command |
+| args     | a list of strings, the words in <code>argstr</code>      |
+| dobjstr  | a string, the direct object string found during parsing  |
+| dobj     | an object, the direct object value found during matching |
+| prepstr  | a string, the prepositional phrase found during parsing  |
+| iobjstr  | a string, the indirect object string                     |
+| iobj     | an object, the indirect object value                     |
 
 
 The value returned by the program, if any, is ignored by the server.
@@ -791,64 +791,64 @@ Note that, along with almost everything else in MOO, the case of the letters in 
 
 A variable name is itself an expression; its value is the value of the named variable. When a verb begins, almost no variables have values yet; if you try to use the value of a variable that doesn't have one, the error value `E_VARNF` is raised. (MOO is unlike many other programming languages in which one must _declare_ each variable before using it; MOO has no such declarations.)  The following variables always have values:
 
-| Variable  |
-| ------------- |
-| INT |
-| NUM |
-| FLOAT |
-| OBJ |
-| STR |
-| LIST |
-| ERR |
-| BOOL |
-| MAP |
-| WAIF |
-| ANON |
-| true | 
-| false |
-| player |
-| this |
-| caller |
-| verb |
-| args |
-| argstr |
-| dobj |
-| dobjstr |
-| prepstr |
-| iobj |
-| iobjstr |
+| Variable |
+| -------- |
+| INT      |
+| NUM      |
+| FLOAT    |
+| OBJ      |
+| STR      |
+| LIST     |
+| ERR      |
+| BOOL     |
+| MAP      |
+| WAIF     |
+| ANON     |
+| true     |
+| false    |
+| player   |
+| this     |
+| caller   |
+| verb     |
+| args     |
+| argstr   |
+| dobj     |
+| dobjstr  |
+| prepstr  |
+| iobj     |
+| iobjstr  |
 
 > Note: `num` is a deprecated reference to `int` and has been presented only for completeness.
 
 The values of some of these variables always start out the same:
 
-| Variable  | Value | Description |
-| ------------- | ------------- |------------- |
-| <code>INT</code> | 0 | an integer, the type code for integers |
-| <code>NUM</code> | 0 | (deprecated) an integer, the type code for integers |
-| <code>OBJ</code> | 1 |an integer, the type code for objects |
-| <code>STR</code> | 2 | an integer, the type code for strings |
-| <code>ERR</code> | 3 | an integer, the type code for error values |
-| <code>LIST</code> | 4 | an integer, the type code for lists |
-| <code>FLOAT</code> | 9 | an integer, the type code for floating-point numbers |
-| <code>MAP</code> | 10 | an integer, the type code for map values |
-| <code>ANON</code> | 12 | an integer, the type code for anonymous object values |
-| <code>WAIF</code> | 13 | an integer, the type code for WAIF values |
-| <code>BOOL</code> | 14 | an integer, the type code for bool values |
-| <code>true</code> | true | the boolean true |
-| <code>false</code> | false | the boolean false |
+| Variable           | Value | Description                                           |
+| ------------------ | ----- | ----------------------------------------------------- |
+| <code>INT</code>   | 0     | an integer, the type code for integers                |
+| <code>NUM</code>   | 0     | (deprecated) an integer, the type code for integers   |
+| <code>OBJ</code>   | 1     | an integer, the type code for objects                 |
+| <code>STR</code>   | 2     | an integer, the type code for strings                 |
+| <code>ERR</code>   | 3     | an integer, the type code for error values            |
+| <code>LIST</code>  | 4     | an integer, the type code for lists                   |
+| <code>FLOAT</code> | 9     | an integer, the type code for floating-point numbers  |
+| <code>MAP</code>   | 10    | an integer, the type code for map values              |
+| <code>ANON</code>  | 12    | an integer, the type code for anonymous object values |
+| <code>WAIF</code>  | 13    | an integer, the type code for WAIF values             |
+| <code>BOOL</code>  | 14    | an integer, the type code for bool values             |
+| <code>true</code>  | true  | the boolean true                                      |
+| <code>false</code> | false | the boolean false                                     |
 
 > Note: The `typeof` function can is of note here and is described in the built-ins section.
 
 For others, the general meaning of the value is consistent, though the value itself is different for different situations:
 
-| Variable  |  Value |
-| ------------- | ------------- |
-| <code>player</code> | an object, the player who typed the command that started the task that involved running this piece of code.
-| <code>this</code> | an object, the object on which the currently-running verb was found.
-| <code>caller</code> | an object, the object on which the verb that called the currently-running verb was found. For the first verb called for a given command, <code>caller</code> has the same value as <code>player</code>.
-| <code>verb</code> | a string, the name by which the currently-running verb was identified.
-| <code>args</code> | a list, the arguments given to this verb. For the first verb called for a given command, this is a list of strings, the words on the command line.
+| Variable            | Value                                                                                                                                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <code>player</code> | an object, the player who typed the command that started the task that involved running this piece of code.                                                                                             |
+| <code>this</code>   | an object, the object on which the currently-running verb was found.                                                                                                                                    |
+| <code>caller</code> | an object, the object on which the verb that called the currently-running verb was found. For the first verb called for a given command, <code>caller</code> has the same value as <code>player</code>. |
+| <code>verb</code>   | a string, the name by which the currently-running verb was identified.                                                                                                                                  |
+| <code>args</code>   | a list, the arguments given to this verb. For the first verb called for a given command, this is a list of strings, the words on the command line.                                                      |
 
 The rest of the so-called "built-in" variables are only really meaningful for the first verb called for a given command. Their semantics is given in the discussion of command parsing, above.
 
@@ -941,14 +941,14 @@ MOO also supports the exponentiation operation, also known as "raising to a powe
 
 MOO also supports bitwise operations on integer types: 
 
-| Operator  | Meaning |
-| ------------- | ------------- |
-| &. | bitwise `and` |
-| \|. | bitwise `or` |
-| ^. | bitwise `xor`  |
-| >> | logical (not arithmetic) right-shift |
-| << | logical (not arithmetic) left-shift |
-| ~ | complement |
+| Operator | Meaning                              |
+| -------- | ------------------------------------ |
+| &.       | bitwise `and`                        |
+| \|.      | bitwise `or`                         |
+| ^.       | bitwise `xor`                        |
+| >>       | logical (not arithmetic) right-shift |
+| <<       | logical (not arithmetic) left-shift  |
+| ~        | complement                           |
 
 In the following table, the expressions on the left have the corresponding values on the right:
 
@@ -990,12 +990,12 @@ Note that integers and floating-point numbers are never equal to one another, ev
 
 Integers, floats, object numbers, strings, and error values can also be compared for ordering purposes using the following operators:
 
-| Operator  | Meaning |
-| ------------- | ------------- |
-| &lt; | meaning &quot;less than&quot; |
-| &lt;= | &quot;less than or equal&quot; |
-| &gt;= | &quot;greater than or equal&quot; |
-| &gt; | &quot;greater than&quot; |
+| Operator | Meaning                           |
+| -------- | --------------------------------- |
+| &lt;     | meaning &quot;less than&quot;     |
+| &lt;=    | &quot;less than or equal&quot;    |
+| &gt;=    | &quot;greater than or equal&quot; |
+| &gt;     | &quot;greater than&quot;          |
 
 As with the equality operators, these return 1 when their operands are in the appropriate relation and 0 otherwise:
 
@@ -1380,12 +1380,12 @@ MOO provides a special kind of assignment expression, called _scattering assignm
 
 where each target describes a place to store elements of the list that results from evaluating expr. A target has one of the following forms:
 
-| Target  | Description |
-| ------------- | ------------- |
-| <code>variable</code> | This is the simplest target, just a simple variable; the list element in the corresponding position is assigned to the variable. This is called a <em>required</em> target, since the assignment is required to put one of the list elements into the variable. |
-| <code>?variable</code> | This is called an <em>optional</em> target, since it doesn't always get assigned an element. If there are any list elements left over after all of the required targets have been accounted for (along with all of the other optionals to the left of this one), then this variable is treated like a required one and the list element in the corresponding position is assigned to the variable. If there aren't enough elements to assign one to this target, then no assignment is made to this variable, leaving it with whatever its previous value was. |
-| <code>?variable = default-expr</code> | This is also an optional target, but if there aren't enough list elements available to assign one to this target, the result of evaluating default-expr is assigned to it instead. Thus, default-expr provides a <em>default value</em> for the variable. The default value expressions are evaluated and assigned working from left to right <em>after</em> all of the other assignments have been performed. |
-| <code>@variable</code> | By analogy with the <code>@</code> syntax in list construction, this variable is assigned a list of all of the 'leftover' list elements in this part of the list after all of the other targets have been filled in. It is assigned the empty list if there aren't any elements left over. This is called a <em>rest</em> target, since it gets the rest of the elements. There may be at most one rest target in each scattering assignment expression. |
+| Target                                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <code>variable</code>                 | This is the simplest target, just a simple variable; the list element in the corresponding position is assigned to the variable. This is called a <em>required</em> target, since the assignment is required to put one of the list elements into the variable.                                                                                                                                                                                                                                                                                                |
+| <code>?variable</code>                | This is called an <em>optional</em> target, since it doesn't always get assigned an element. If there are any list elements left over after all of the required targets have been accounted for (along with all of the other optionals to the left of this one), then this variable is treated like a required one and the list element in the corresponding position is assigned to the variable. If there aren't enough elements to assign one to this target, then no assignment is made to this variable, leaving it with whatever its previous value was. |
+| <code>?variable = default-expr</code> | This is also an optional target, but if there aren't enough list elements available to assign one to this target, the result of evaluating default-expr is assigned to it instead. Thus, default-expr provides a <em>default value</em> for the variable. The default value expressions are evaluated and assigned working from left to right <em>after</em> all of the other assignments have been performed.                                                                                                                                                 |
+| <code>@variable</code>                | By analogy with the <code>@</code> syntax in list construction, this variable is assigned a list of all of the 'leftover' list elements in this part of the list after all of the other targets have been filled in. It is assigned the empty list if there aren't any elements left over. This is called a <em>rest</em> target, since it gets the rest of the elements. There may be at most one rest target in each scattering assignment expression.                                                                                                       |
 
 If there aren't enough list elements to fill all of the required targets, or if there are more than enough to fill all of the required and optional targets but there isn't a rest target to take the leftover ones, then `E_ARGS` is raised.
 
@@ -1512,12 +1512,12 @@ expr-0:name(expr-1, expr-2, ..., expr-N)
 
 Expr-0 must return an object number; `E_TYPE` is raised otherwise.  If the object with that number does not exist, `E_INVIND` is raised. If this task is too deeply nested in verbs calling verbs calling verbs, then `E_MAXREC` is raised; the default limit is 50 levels, but this can be changed from within the database; see the chapter on server assumptions about the database for details. If neither the object nor any of its ancestors defines a verb matching the given name, `E_VERBNF` is raised.  Otherwise, if none of these nasty things happens, the named verb on the given object is called; the various built-in variables have the following initial values in the called verb:
 
-| Variable  | Description |
-| ------------- | ------------- |
-| <code>this</code> | an object, the value of expr-0 |
-| <code>verb</code> | a string, the name used in calling this verb |
-| <code>args</code> | a list, the values of expr-1, expr-2, etc. |
-| <code>caller</code> | an object, the value of <code>this</code> in the calling verb |
+| Variable            | Description                                                                                                                                                                      |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <code>this</code>   | an object, the value of expr-0                                                                                                                                                   |
+| <code>verb</code>   | a string, the name used in calling this verb                                                                                                                                     |
+| <code>args</code>   | a list, the values of expr-1, expr-2, etc.                                                                                                                                       |
+| <code>caller</code> | an object, the value of <code>this</code> in the calling verb                                                                                                                    |
 | <code>player</code> | an object, the same value as it had initially in the calling verb or, if the calling verb is running with wizard permissions, the same as the current value in the calling verb. |
 
 All other built-in variables (`argstr`, `dobj`, etc.) are initialized with the same values they have in the calling verb.
@@ -3220,27 +3220,28 @@ As a simple example, we can concatenate the regular expressions `f` and `o` to g
 
 The following are the characters and character sequences that have special meaning within regular expressions. Any character not mentioned here is not special; it stands for exactly itself for the purposes of searching and matching.
 
-| Character Sequences  | Special Meaning |
-| ------------- | ------------- |
-| <code>.</code> | is a special character that matches any single character. Using concatenation, we can make regular expressions like <code>a.b</code>, which matches any three-character string that begins with <code>a</code> and ends with <code>b</code>. |
-| <code>*</code> | is not a construct by itself; it is a suffix that means that the preceding regular expression is to be repeated as many times as possible. In <code>fo*</code>, the <code>*</code> applies to the <code>o</code>, so <code>fo*</code> matches <code>f</code> followed by any number of <code>o</code>&apos;s. The case of zero <code>o</code>&apos;s is allowed: <code>fo*</code> does match <code>f</code>.  <code>*</code> always applies to the <em>smallest</em> possible preceding expression.  Thus, <code>fo*</code> has a repeating <code>o</code>, not a repeating <code>fo</code>.  The matcher processes a <code>*</code> construct by matching, immediately, as many repetitions as can be found. Then it continues with the rest of the pattern.  If that fails, it backtracks, discarding some of the matches of the <code>*</code>&apos;d construct in case that makes it possible to match the rest of the pattern. For example, matching <code>c[ad]*ar</code> against the string <code>caddaar</code>, the <code>[ad]*</code> first matches <code>addaa</code>, but this does not allow the next <code>a</code> in the pattern to match. So the last of the matches of <code>[ad]</code> is undone and the following <code>a</code> is tried again. Now it succeeds. |
-| <code>+</code> | <code>+</code> is like <code>*</code> except that at least one match for the preceding pattern is required for <code>+</code>. Thus, <code>c[ad]+r</code> does not match <code>cr</code> but does match anything else that <code>c[ad]*r</code> would match. |
-| <code>?</code> | <code>?</code> is like <code>*</code> except that it allows either zero or one match for the preceding pattern. Thus, <code>c[ad]?r</code> matches <code>cr</code> or <code>car</code> or <code>cdr</code>, and nothing else. |
-| <code>[ ... ]</code> | <code>[</code> begins a <em>character set</em>, which is terminated by a <code>]</code>. In the simplest case, the characters between the two brackets form the set. Thus, <code>[ad]</code> matches either <code>a</code> or <code>d</code>, and <code>[ad]*</code> matches any string of <code>a</code>&apos;s and <code>d</code>&apos;s (including the empty string), from which it follows that <code>c[ad]*r</code> matches <code>car</code>, etc.<br>Character ranges can also be included in a character set, by writing two characters with a <code>-</code> between them. Thus, <code>[a-z]</code> matches any lower-case letter. Ranges may be intermixed freely with individual characters, as in <code>[a-z$%.]</code>, which matches any lower case letter or <code>$</code>, <code>%</code> or period.<br> Note that the usual special characters are not special any more inside a character set. A completely different set of special characters exists inside character sets: <code>]</code>, <code>-</code> and <code>^</code>.<br> To include a <code>]</code> in a character set, you must make it the first character.  For example, <code>[]a]</code> matches <code>]</code> or <code>a</code>. To include a <code>-</code>, you must use it in a context where it cannot possibly indicate a range: that is, as the first character, or immediately after a range.
-| <code>[^ ... ]</code> | <code>[^</code> begins a <em>complement character set</em>, which matches any character except the ones specified. Thus, <code>[^a-z0-9A-Z]</code> matches all characters <em>except</em> letters and digits.<br><code>^</code> is not special in a character set unless it is the first character.  The character following the <code>^</code> is treated as if it were first (it may be a <code>-</code> or a <code>]</code>). |
-| <code>^</code> | is a special character that matches the empty string -- but only if at the beginning of the string being matched. Otherwise it fails to match anything.  Thus, <code>^foo</code> matches a <code>foo</code> which occurs at the beginning of the string. |
-| <code>$</code> | is similar to <code>^</code> but matches only at the <em>end</em> of the string. Thus, <code>xx*$</code> matches a string of one or more <code>x</code>&apos;s at the end of the string. |
-| <code>%</code> | has two functions: it quotes the above special characters (including <code>%</code>), and it introduces additional special constructs.<br> Because <code>%</code> quotes special characters, <code>%$</code> is a regular expression that matches only <code>$</code>, and <code>%[</code> is a regular expression that matches only <code>[</code>, and so on.<br> For the most part, <code>%</code> followed by any character matches only that character. However, there are several exceptions: characters that, when preceded by <code>%</code>, are special constructs. Such characters are always ordinary when encountered on their own.<br>  No new special characters will ever be defined. All extensions to the regular expression syntax are made by defining new two-character constructs that begin with <code>%</code>. |
-| <code>%\|</code> | specifies an alternative. Two regular expressions a and b with <code>%|</code> in between form an expression that matches anything that either a or b will match.<br> Thus, <code>foo%|bar</code> matches either <code>foo</code> or <code>bar</code> but no other string. |
+| Character Sequences   | Special Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |                                                                                                                 |                                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| <code>.</code>        | is a special character that matches any single character. Using concatenation, we can make regular expressions like <code>a.b</code>, which matches any three-character string that begins with <code>a</code> and ends with <code>b</code>.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                                                                                                                 |                                                                                     |
+| <code>*</code>        | is not a construct by itself; it is a suffix that means that the preceding regular expression is to be repeated as many times as possible. In <code>fo*</code>, the <code>*</code> applies to the <code>o</code>, so <code>fo*</code> matches <code>f</code> followed by any number of <code>o</code>&apos;s. The case of zero <code>o</code>&apos;s is allowed: <code>fo*</code> does match <code>f</code>.  <code>*</code> always applies to the <em>smallest</em> possible preceding expression.  Thus, <code>fo*</code> has a repeating <code>o</code>, not a repeating <code>fo</code>.  The matcher processes a <code>*</code> construct by matching, immediately, as many repetitions as can be found. Then it continues with the rest of the pattern.  If that fails, it backtracks, discarding some of the matches of the <code>*</code>&apos;d construct in case that makes it possible to match the rest of the pattern. For example, matching <code>c[ad]*ar</code> against the string <code>caddaar</code>, the <code>[ad]*</code> first matches <code>addaa</code>, but this does not allow the next <code>a</code> in the pattern to match. So the last of the matches of <code>[ad]</code> is undone and the following <code>a</code> is tried again. Now it succeeds.                                                                                                     |                                                                                                                 |                                                                                     |
+| <code>+</code>        | <code>+</code> is like <code>*</code> except that at least one match for the preceding pattern is required for <code>+</code>. Thus, <code>c[ad]+r</code> does not match <code>cr</code> but does match anything else that <code>c[ad]*r</code> would match.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                                                                                                                 |                                                                                     |
+| <code>?</code>        | <code>?</code> is like <code>*</code> except that it allows either zero or one match for the preceding pattern. Thus, <code>c[ad]?r</code> matches <code>cr</code> or <code>car</code> or <code>cdr</code>, and nothing else.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                 |                                                                                     |
+| <code>[ ... ]</code>  | <code>[</code> begins a <em>character set</em>, which is terminated by a <code>]</code>. In the simplest case, the characters between the two brackets form the set. Thus, <code>[ad]</code> matches either <code>a</code> or <code>d</code>, and <code>[ad]*</code> matches any string of <code>a</code>&apos;s and <code>d</code>&apos;s (including the empty string), from which it follows that <code>c[ad]*r</code> matches <code>car</code>, etc.<br>Character ranges can also be included in a character set, by writing two characters with a <code>-</code> between them. Thus, <code>[a-z]</code> matches any lower-case letter. Ranges may be intermixed freely with individual characters, as in <code>[a-z$%.]</code>, which matches any lower case letter or <code>$</code>, <code>%</code> or period.<br> Note that the usual special characters are not special any more inside a character set. A completely different set of special characters exists inside character sets: <code>]</code>, <code>-</code> and <code>^</code>.<br> To include a <code>]</code> in a character set, you must make it the first character.  For example, <code>[]a]</code> matches <code>]</code> or <code>a</code>. To include a <code>-</code>, you must use it in a context where it cannot possibly indicate a range: that is, as the first character, or immediately after a range. |                                                                                                                 |                                                                                     |
+| <code>[^ ... ]</code> | <code>[^</code> begins a <em>complement character set</em>, which matches any character except the ones specified. Thus, <code>[^a-z0-9A-Z]</code> matches all characters <em>except</em> letters and digits.<br><code>^</code> is not special in a character set unless it is the first character.  The character following the <code>^</code> is treated as if it were first (it may be a <code>-</code> or a <code>]</code>).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |                                                                                                                 |                                                                                     |
+| <code>^</code>        | is a special character that matches the empty string -- but only if at the beginning of the string being matched. Otherwise it fails to match anything.  Thus, <code>^foo</code> matches a <code>foo</code> which occurs at the beginning of the string.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |                                                                                                                 |                                                                                     |
+| <code>$</code>        | is similar to <code>^</code> but matches only at the <em>end</em> of the string. Thus, <code>xx*$</code> matches a string of one or more <code>x</code>&apos;s at the end of the string.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |                                                                                                                 |                                                                                     |
+| <code>%</code>        | has two functions: it quotes the above special characters (including <code>%</code>), and it introduces additional special constructs.<br> Because <code>%</code> quotes special characters, <code>%$</code> is a regular expression that matches only <code>$</code>, and <code>%[</code> is a regular expression that matches only <code>[</code>, and so on.<br> For the most part, <code>%</code> followed by any character matches only that character. However, there are several exceptions: characters that, when preceded by <code>%</code>, are special constructs. Such characters are always ordinary when encountered on their own.<br>  No new special characters will ever be defined. All extensions to the regular expression syntax are made by defining new two-character constructs that begin with <code>%</code>.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |                                                                                                                 |                                                                                     |
+| <code>%\|</code>      | specifies an alternative. Two regular expressions a and b with <code>%                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | </code> in between form an expression that matches anything that either a or b will match.<br> Thus, <code>foo% | bar</code> matches either <code>foo</code> or <code>bar</code> but no other string. |
 <code>%|</code> applies to the largest possible surrounding expressions. Only a surrounding <code>%( ... %)</code> grouping can limit the grouping power of <code>%|</code>.<br> Full backtracking capability exists for when multiple <code>%|</code>&apos;s are used. |
-| <code>%( ... %)</code> | is a grouping construct that serves three purposes:<br> * To enclose a set of <code>%\|</code> alternatives for other operations. Thus, <code>%(foo%\|bar%)x</code> matches either <code>foox</code> or <code>barx</code>.<br> * To enclose a complicated expression for a following <code>*</code>, <code>+</code>, or <code>?</code> to operate on. Thus, <code>ba%(na%)*</code> matches <code>bananana</code>, etc., with any number of <code>na</code>&apos;s, including none.<br> * To mark a matched substring for future reference.<br> This last application is not a consequence of the idea of a parenthetical grouping; it is a separate feature that happens to be assigned as a second meaning to the same <code>%( ... %)</code> construct because there is no conflict in practice between the two meanings. Here is an explanation of this feature: |
-| <code>%digit</code> | After the end of a <code>%( ... %)</code> construct, the matcher remembers the beginning and end of the text matched by that construct. Then, later on in the regular expression, you can use <code>%</code> followed by digit to mean &quot;match the same text matched by the digit&apos;th <code>%( ... %)</code> construct in the pattern.&quot;  The <code>%( ... %)</code> constructs are numbered in the order that their <code>%(</code>&apos;s appear in the pattern.<br> The strings matching the first nine <code>%( ... %)</code> constructs appearing in a regular expression are assigned numbers 1 through 9 in order of their beginnings. <code>%1</code> through <code>%9</code> may be used to refer to the text matched by the corresponding <code>%( ... %)</code> construct.<br> For example, <code>%(.*%)%1</code> matches any string that is composed of two identical halves. The <code>%(.*%)</code> matches the first half, which may be anything, but the <code>%1</code> that follows must match the same exact text. |
-| <code>%b</code> | matches the empty string, but only if it is at the beginning or end of a word. Thus, <code>%bfoo%b</code> matches any occurrence of <code>foo</code> as a separate word. <code>%bball%(s%|%)%b</code> matches <code>ball</code> or <code>balls</code> as a separate word.<br> For the purposes of this construct and the five that follow, a word is defined to be a sequence of letters and/or digits. |
-| <code>%B</code> | matches the empty string, provided it is <em>not</em> at the beginning or end of a word. |
-| <code>%&lt;</code> | matches the empty string, but only if it is at the beginning of a word. |
-| <code>%&gt;</code> | matches the empty string, but only if it is at the end of a word. |
-| <code>%w</code> | matches any word-constituent character (i.e., any letter or digit). |
-| <code>%W</code> | matches any character that is not a word constituent. |
+| <code>%( ... %)</code> | is a grouping construct that serves three purposes:<br> * To enclose a set of <code>%\|</code> alternatives for other operations. Thus, <code>%(foo%\|bar%)x</code> matches either <code>foox</code> or <code>barx</code>.<br> * To enclose a complicated expression for a following <code>*</code>, <code>+</code>, or <code>?</code> to operate on. Thus, <code>ba%(na%)*</code> matches <code>bananana</code>, etc., with any number of <code>na</code>&apos;s, including none.<br> * To mark a matched substring for future reference.<br> This last application is not a consequence of the idea of a parenthetical grouping; it is a separate feature that happens to be assigned as a second meaning to the same <code>%( ... %)</code> construct because there is no conflict in practice between the two meanings. Here is an explanation of this feature:                                                                                                                                                                               |                                                                                                                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <code>%digit</code>    | After the end of a <code>%( ... %)</code> construct, the matcher remembers the beginning and end of the text matched by that construct. Then, later on in the regular expression, you can use <code>%</code> followed by digit to mean &quot;match the same text matched by the digit&apos;th <code>%( ... %)</code> construct in the pattern.&quot;  The <code>%( ... %)</code> constructs are numbered in the order that their <code>%(</code>&apos;s appear in the pattern.<br> The strings matching the first nine <code>%( ... %)</code> constructs appearing in a regular expression are assigned numbers 1 through 9 in order of their beginnings. <code>%1</code> through <code>%9</code> may be used to refer to the text matched by the corresponding <code>%( ... %)</code> construct.<br> For example, <code>%(.*%)%1</code> matches any string that is composed of two identical halves. The <code>%(.*%)</code> matches the first half, which may be anything, but the <code>%1</code> that follows must match the same exact text. |                                                                                                                                                                                                               |
+| <code>%b</code>        | matches the empty string, but only if it is at the beginning or end of a word. Thus, <code>%bfoo%b</code> matches any occurrence of <code>foo</code> as a separate word. <code>%bball%(s%                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | %)%b</code> matches <code>ball</code> or <code>balls</code> as a separate word.<br> For the purposes of this construct and the five that follow, a word is defined to be a sequence of letters and/or digits. |
+| <code>%B</code>        | matches the empty string, provided it is <em>not</em> at the beginning or end of a word.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |                                                                                                                                                                                                               |
+| <code>%&lt;</code>     | matches the empty string, but only if it is at the beginning of a word.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |                                                                                                                                                                                                               |
+| <code>%&gt;</code>     | matches the empty string, but only if it is at the end of a word.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |                                                                                                                                                                                                               |
+| <code>%w</code>        | matches any word-constituent character (i.e., any letter or digit).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                                                                                                                                                                                                               |
+| <code>%W</code>        | matches any character that is not a word constituent.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |                                                                                                                                                                                                               |
 
 **Function: `substitute`**
 
@@ -4586,19 +4587,19 @@ Regardless of whether or not the limit was changed, the sqlite_limit() function 
 
 As of this writing, the following limits exist:
 
-| Limit  | Description |
-| ------------- | ------------- |
-| LIMIT_LENGTH | The maximum size of any string or BLOB or table row, in bytes. |
-| LIMIT_SQL_LENGTH | The maximum length of an SQL statement, in bytes. |
-| LIMIT_COLUMN | The maximum number of columns in a table definition or in the result set of a SELECT or the maximum number of columns in an index or in an ORDER BY or GROUP BY clause. |
-| LIMIT_EXPR_DEPTH | The maximum depth of the parse tree on any expression. |
-| LIMIT_COMPOUND_SELECT | The maximum number of terms in a compound SELECT statement. |
-| LIMIT_VDBE_OP | The maximum number of instructions in a virtual machine program used to implement an SQL statement. If sqlite3_prepare_v2() or the equivalent tries to allocate space for more than this many opcodes in a single prepared statement, an SQLITE_NOMEM error is returned. |
-| LIMIT_FUNCTION_ARG  | The maximum number of arguments on a function. |
-| LIMIT_ATTACHED | The maximum number of attached databases. |
-| LIMIT_LIKE_PATTERN_LENGTH | The maximum length of the pattern argument to the LIKE or GLOB operators. |
-| LIMIT_VARIABLE_NUMBER | The maximum index number of any parameter in an SQL statement. |
-| LIMIT_TRIGGER_DEPTH | The maximum depth of recursion for triggers. |
+| Limit                     | Description                                                                                                                                                                                                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| LIMIT_LENGTH              | The maximum size of any string or BLOB or table row, in bytes.                                                                                                                                                                                                           |
+| LIMIT_SQL_LENGTH          | The maximum length of an SQL statement, in bytes.                                                                                                                                                                                                                        |
+| LIMIT_COLUMN              | The maximum number of columns in a table definition or in the result set of a SELECT or the maximum number of columns in an index or in an ORDER BY or GROUP BY clause.                                                                                                  |
+| LIMIT_EXPR_DEPTH          | The maximum depth of the parse tree on any expression.                                                                                                                                                                                                                   |
+| LIMIT_COMPOUND_SELECT     | The maximum number of terms in a compound SELECT statement.                                                                                                                                                                                                              |
+| LIMIT_VDBE_OP             | The maximum number of instructions in a virtual machine program used to implement an SQL statement. If sqlite3_prepare_v2() or the equivalent tries to allocate space for more than this many opcodes in a single prepared statement, an SQLITE_NOMEM error is returned. |
+| LIMIT_FUNCTION_ARG        | The maximum number of arguments on a function.                                                                                                                                                                                                                           |
+| LIMIT_ATTACHED            | The maximum number of attached databases.                                                                                                                                                                                                                                |
+| LIMIT_LIKE_PATTERN_LENGTH | The maximum length of the pattern argument to the LIKE or GLOB operators.                                                                                                                                                                                                |
+| LIMIT_VARIABLE_NUMBER     | The maximum index number of any parameter in an SQL statement.                                                                                                                                                                                                           |
+| LIMIT_TRIGGER_DEPTH       | The maximum depth of recursion for triggers.                                                                                                                                                                                                                             |
 | LIMIT_WORKER_THREADS | The maximum number of auxiliary worker threads that a single prepared statement may start. |
 
 For an up-to-date list of limits, see the [SQLite documentation](https://www.sqlite.org/c3ref/c_limit_attached.html).
@@ -4819,15 +4820,15 @@ connection_info -- Returns a MAP of network connection information for `connecti
 
 list `connection_info` (OBJ `connection`)
 
-| Key  | Value |
-| ------------- | ------------- |
+| Key                 | Value                                                                                                                                                                                          |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | destination_address | The hostname of the connection. For incoming connections, this is the hostname of the connected user. For outbound connections, this is the hostname of the outbound connection's destination. |
-| destination_ip | The unresolved numeric IP address of the connection. |
-| destination_port | For incoming connections, this is the local port used to make the connection. For outbound connections, this is the port the connection was made to. |
-| source_address | This is the hostname of the interface an incoming connection was made on. For outbound connections, this value is meaningless. |
-| source_ip | The unresolved numeric IP address of the interface a connection was made on. For outbound connections, this value is meaningless. |
-| source_port | The local port a connection connected to. For outbound connections, this value is meaningless. |
-| protocol | Describes the protocol used to make the connection. At the time of writing, this could be IPv4 or IPv6. |
+| destination_ip      | The unresolved numeric IP address of the connection.                                                                                                                                           |
+| destination_port    | For incoming connections, this is the local port used to make the connection. For outbound connections, this is the port the connection was made to.                                           |
+| source_address      | This is the hostname of the interface an incoming connection was made on. For outbound connections, this value is meaningless.                                                                 |
+| source_ip           | The unresolved numeric IP address of the interface a connection was made on. For outbound connections, this value is meaningless.                                                              |
+| source_port         | The local port a connection connected to. For outbound connections, this value is meaningless.                                                                                                 |
+| protocol            | Describes the protocol used to make the connection. At the time of writing, this could be IPv4 or IPv6.                                                                                        |
 | outbound | Indicates whether a connection is outbound or not |
 
 **Function: `connection_name`**
@@ -5449,16 +5450,16 @@ When enabled (via SAVE_FINISHED_TASKS in options.h), the server will keep track 
 
 The first is the finished_tasks() function. This function will return a list of maps of the last several finished tasks (configurable via $server_options.finished_tasks_limit) with the following information:
 
-| Value  | Description |
-| ------------- | ------------- |
-| foreground |  1 if the task was a foreground task, 0 if it was a background task |
-| fullverb | the full name of the verb, including aliases |
-| object | the object that defines the verb |
-| player | the player that initiated the task | 
-| programmer | the programmer who owns the verb | 
-| receiver | typically the same as 'this' but could be the handler in the case of primitive values | 
-| suspended | whether the task was suspended or not | 
-| this | the actual object the verb was called on |
+| Value      | Description                                                                           |
+| ---------- | ------------------------------------------------------------------------------------- |
+| foreground | 1 if the task was a foreground task, 0 if it was a background task                    |
+| fullverb   | the full name of the verb, including aliases                                          |
+| object     | the object that defines the verb                                                      |
+| player     | the player that initiated the task                                                    |
+| programmer | the programmer who owns the verb                                                      |
+| receiver   | typically the same as 'this' but could be the handler in the case of primitive values |
+| suspended  | whether the task was suspended or not                                                 |
+| this       | the actual object the verb was called on                                              |
 | time | the total time it took the verb to run), and verb (the name of the verb call or command typed |
 
 The second is via the $handle_lagging_task verb. When the execution threshold defined in $server_options.task_lag_threshold is exceeded, the server will write an entry to the log file and call the $handle_lagging_task verb with the call stack of the task as well as the execution time.
@@ -5814,31 +5815,31 @@ Many optional behaviors of the server can be controlled from within the database
 
 The specific properties searched for are each described in the appropriate section below, but here is a brief list of all of the relevant properties for ease of reference:
 
-| Property  | Description |
-| ------------- | ------------- |
-| bg_seconds | The number of seconds allotted to background tasks. |
-| bg_ticks | The number of ticks allotted to background tasks. |
-| connect_timeout | The maximum number of seconds to allow an un-logged-in in-bound connection to remain open. |
-| default_flush_command | The initial setting of each new connection&apos;s flush command. |
-| fg_seconds | The number of seconds allotted to foreground tasks. |
-| fg_ticks | The number of ticks allotted to foreground tasks. |
-| max_stack_depth | The maximum number of levels of nested verb calls. Only used if it is higher than default |
-| name_lookup_timeout | The maximum number of seconds to wait for a network hostname/address lookup. |
-| outbound_connect_timeout | The maximum number of seconds to wait for an outbound network connection to successfully open. |
-| protect_`property` | Restrict reading/writing of built-in `property` to wizards. |
-| protect_`function` | Restrict use of built-in `function` to wizards. |
-| queued_task_limit | The maximum number of forked or suspended tasks any player can have queued at a given time. |
-| support_numeric_verbname_strings | Enables use of an obsolete verb-naming mechanism. |
-| max_queued_output | The maximum number of output characters the server is willing to buffer for any given network connection before discarding old output to make way for new. | 
-| dump_interval | an int in seconds for how often to checkpoint the database. |
-| proxy_rewrite | control whether IPs from proxies get rewritten. | 
-| file_io_max_files | allow DB-changeable limits on how many files can be opened at once. |
-| sqlite_max_handles | allow DB-changeable limits on how many SQLite connections can be opened at once. |
-| task_lag_threshold | override default task_lag_threshold for handling lagging tasks | 
-| finished_tasks_limit | override default finished_tasks_limit (enables the finished_tasks function and define how many tasks get saved by default) |
-| no_name_lookup | override default no_name_lookup (disables automatic DNS name resolution on new connections) |
-| max_list_concat | limit the size of user-constructed lists |
-| max_string_concat | limit the size of user-constructed strings |
+| Property                         | Description                                                                                                                                                |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bg_seconds                       | The number of seconds allotted to background tasks.                                                                                                        |
+| bg_ticks                         | The number of ticks allotted to background tasks.                                                                                                          |
+| connect_timeout                  | The maximum number of seconds to allow an un-logged-in in-bound connection to remain open.                                                                 |
+| default_flush_command            | The initial setting of each new connection&apos;s flush command.                                                                                           |
+| fg_seconds                       | The number of seconds allotted to foreground tasks.                                                                                                        |
+| fg_ticks                         | The number of ticks allotted to foreground tasks.                                                                                                          |
+| max_stack_depth                  | The maximum number of levels of nested verb calls. Only used if it is higher than default                                                                  |
+| name_lookup_timeout              | The maximum number of seconds to wait for a network hostname/address lookup.                                                                               |
+| outbound_connect_timeout         | The maximum number of seconds to wait for an outbound network connection to successfully open.                                                             |
+| protect_`property`               | Restrict reading/writing of built-in `property` to wizards.                                                                                                |
+| protect_`function`               | Restrict use of built-in `function` to wizards.                                                                                                            |
+| queued_task_limit                | The maximum number of forked or suspended tasks any player can have queued at a given time.                                                                |
+| support_numeric_verbname_strings | Enables use of an obsolete verb-naming mechanism.                                                                                                          |
+| max_queued_output                | The maximum number of output characters the server is willing to buffer for any given network connection before discarding old output to make way for new. |
+| dump_interval                    | an int in seconds for how often to checkpoint the database.                                                                                                |
+| proxy_rewrite                    | control whether IPs from proxies get rewritten.                                                                                                            |
+| file_io_max_files                | allow DB-changeable limits on how many files can be opened at once.                                                                                        |
+| sqlite_max_handles               | allow DB-changeable limits on how many SQLite connections can be opened at once.                                                                           |
+| task_lag_threshold               | override default task_lag_threshold for handling lagging tasks                                                                                             |
+| finished_tasks_limit             | override default finished_tasks_limit (enables the finished_tasks function and define how many tasks get saved by default)                                 |
+| no_name_lookup                   | override default no_name_lookup (disables automatic DNS name resolution on new connections)                                                                |
+| max_list_concat                  | limit the size of user-constructed lists                                                                                                                   |
+| max_string_concat                | limit the size of user-constructed strings                                                                                                                 |
 | max_concat_catchable | govern whether violating concat size limits causes out-of-seconds or E_QUOTA error |
 
 > Note: If you override a default value that was defined in options.h (such as no_name_lookup or finished_tasks_limit, or many others) you will need to call `load_server_options()` for your changes to take affect.
@@ -5855,15 +5856,15 @@ There are a number of circumstances under which the server itself generates mess
 
 The following list covers all of the customizable messages, showing for each the name of the relevant property on `$server_options`, the default message, and the circumstances under which the message is printed:
 
-| Default Message  | Description |
-| ------------- | ------------- |
-| boot_msg = &quot;*** Disconnected ***&quot; | The function boot_player() was called on this connection. |
-| connect_msg = &quot;*** Connected ***&quot; | The user object that just logged in on this connection existed before $do_login_command() was called. |
-| create_msg = &quot;*** Created ***&quot; | The user object that just logged in on this connection did not exist before $do_login_command() was called. |
-| recycle_msg = &quot;*** Recycled ***&quot; | The logged-in user of this connection has been recycled or renumbered (via the renumber() function). |
-| redirect_from_msg = &quot;*** Redirecting connection to new port ***&quot; | The logged-in user of this connection has just logged in on some other connection. |
-| redirect_to_msg = &quot;*** Redirecting old connection to this port ***&quot; | The user who just logged in on this connection was already logged in on some other connection. |
-| server_full_msg Default:  *** Sorry, but the server cannot accept any more connections right now.<br> *** Please try again later.  | This connection arrived when the server really couldn&apos;t accept any more connections, due to running out of a critical operating system resource. |
+| Default Message                                                                                                                   | Description                                                                                                                                           |
+| --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| boot_msg = &quot;*** Disconnected ***&quot;                                                                                       | The function boot_player() was called on this connection.                                                                                             |
+| connect_msg = &quot;*** Connected ***&quot;                                                                                       | The user object that just logged in on this connection existed before $do_login_command() was called.                                                 |
+| create_msg = &quot;*** Created ***&quot;                                                                                          | The user object that just logged in on this connection did not exist before $do_login_command() was called.                                           |
+| recycle_msg = &quot;*** Recycled ***&quot;                                                                                        | The logged-in user of this connection has been recycled or renumbered (via the renumber() function).                                                  |
+| redirect_from_msg = &quot;*** Redirecting connection to new port ***&quot;                                                        | The logged-in user of this connection has just logged in on some other connection.                                                                    |
+| redirect_to_msg = &quot;*** Redirecting old connection to this port ***&quot;                                                     | The user who just logged in on this connection was already logged in on some other connection.                                                        |
+| server_full_msg Default:  *** Sorry, but the server cannot accept any more connections right now.<br> *** Please try again later. | This connection arrived when the server really couldn&apos;t accept any more connections, due to running out of a critical operating system resource. |
 | timeout_msg = &quot;*** Timed-out waiting for login. ***&quot; | This in-bound network connection was idle and un-logged-in for at least CONNECT_TIMEOUT seconds (as defined in the file options.h when the server was compiled). |
 
 > Fine point: If the network connection in question was received at a listening point (established by the `listen()` function) handled by an object obj other than `#0`, then system messages for that connection are looked for on `obj.server_options`; if that property does not exist, then `$server_options` is used instead.
@@ -6009,10 +6010,10 @@ Next, it checks for the existence of the verb $server_started(). If there is suc
 
 As described earlier, in the section describing MOO tasks, the server places limits on the number of seconds for which any task may run continuously and the number of “ticks,” or low-level operations, any task may execute in one unbroken period. By default, foreground tasks may use 60,000 ticks and five seconds, and background tasks may use 30,000 ticks and three seconds. These defaults can be overridden from within the database by defining any or all of the following properties on $server_options and giving them integer values: 
 
-| Property  | Description |
-| ------------- | ------------- |
+| Property   | Description                                         |
+| ---------- | --------------------------------------------------- |
 | bg_seconds | The number of seconds allotted to background tasks. |
-| bg_ticks | The number of ticks allotted to background tasks. |
+| bg_ticks   | The number of ticks allotted to background tasks.   |
 | fg_seconds | The number of seconds allotted to foreground tasks. |
 | fg_ticks | The number of ticks allotted to foreground tasks. |
 
@@ -6098,16 +6099,16 @@ If the property `$server_options.support_numeric_verbname_strings` exists and ha
 
 The server is able to intercept [signals](https://en.wikipedia.org/wiki/Signal_(IPC)) from the operating system and perform certain actions, a list of which can be found below. Two signals, USR1 and USR2, can be processed from within the MOO database. When SIGUSR1 or SIGUSR2 is received, the server will call `#0:handle_signal()` with the name of the signal as the only argument. If this verb returns a true value, it is assumed that the database handled it and no further action is taken. If the verb returns a negative value, the server will proceed to execute the default action for that signal. The following is a list of signals and their default actions:
 
-| Signal | Action                                               |
-| ------ | ---------------------------------------------------- |
-| HUP    | Panic the server.                                    |
-| ILL    | Panic the server.                                    |
-| QUIT   | Panic the server.                                    |
-| SEGV   | Panic the server.                                    |
-| BUS    | Panic the server.                                    |
-| INT    | Cleanly shut down the server.                        |
-| TERM   | Cleanly shut down the server.                        |
-| USR1   | Reopen the log file.                                 |
+| Signal | Action                        |
+| ------ | ----------------------------- |
+| HUP    | Panic the server.             |
+| ILL    | Panic the server.             |
+| QUIT   | Panic the server.             |
+| SEGV   | Panic the server.             |
+| BUS    | Panic the server.             |
+| INT    | Cleanly shut down the server. |
+| TERM   | Cleanly shut down the server. |
+| USR1   | Reopen the log file.          |
 | USR2   | Schedule a checkpoint to happen as soon as possible. |
 
 For example, imagine you're a system administrator logged into the machine running the MOO. You want to shut down the MOO server, but you'd like to give players the opportunity to say goodbye to one another rather than immediately shutting the server down. You can do so by intercepting a signal in the database and invoking the @shutdown command.
@@ -6137,39 +6138,39 @@ The following option values are specified (via #define) in the file `options.h` 
 This list is not intended to be exhaustive.
 Network Options
 
-| Option | Description |
-| ------------- | ------------- |
-| NETWORK_PROTOCOL | This specifies the underlying protocol for the server to use for all connections and will be one of the following:<br>`NP_TCP` The server uses TCP/IP protocols. <br> `NP_LOCAL` The server uses local interprocess communication mechanisms (currently either BSD UNIX-domain sockets or SYSV named pipes).<br>`NP_SINGLE` The server accepts only a single `connection` via the standard input and output streams of the server itself. Attempts to have multiple simultaneous listening points (via listen() will likewise fail. |
-| DEFAULT_PORT | (for NP_TCP) the TCP port number on which the server listens when no port-number argument is given on the command line. |
-| DEFAULT_CONNECT_FILE | (for NP_LOCAL) the local filename through which the server will listen for connections when no connect-file-name is given on the command line. |
-| OUTBOUND_NETWORK | The server will include support for open_network_connection() if this constant is defined. If given a zero value, the function will be disabled by default and `-o` will need to be specified on the command line in order to enable it, otherwise (nonzero or blank value) the function is enabled by default and `-O` will needed to disable it. When disabled or not supported, open_network_connection() raises E_PERM whenever it is called. The NETWORK_PROTOCOL must be NP_TCP. |
-| MAX_QUEUED_OUTPUT | The maximum number of output characters the server is willing to buffer for any given network connection before discarding old output to make way for new. This can be overridden in-database by adding the property `$server_options.max_queued_output` and calling `load_server_options()`. |
-| MAX_QUEUED_INPUT | The maximum number of input characters the server is willing to buffer from any given network connection before it stops reading from the connection at all. |
-| IGNORE_PROP_PROTECTED | Disables protection of builtin properties via $server_options.protect_property when set. See section Protected Properties. |
-| OUT_OF_BAND_PREFIX | Specifies the out-of-band prefix. If this is defined as a non-empty string, then any lines of input from any player that begin with that prefix will not be consumed by reading tasks and will not undergo normal command parsing. See section Out-of-band Processing. |
-| OUT_OF_BAND_QUOTE_PREFIX | Specifies the out-of-band quoting prefix. If this is defined as a non-empty string, then any lines of input from any player that begin with that prefix will have that prefixed stripped and the resulting string will bypass Out-of-Band Processing. |
-| DEFAULT_MAX_STACK_DEPTH | Default value for $server_options.max_stack_depth. |
-| DEFAULT_FG_TICKS | The number of ticks allotted to foreground tasks. Default value for $server_options.fg_ticks. |
-| DEFAULT_BG_TICKS | The number of ticks allotted to background tasks. Default value for $server_options.bg_ticks. |
-| DEFAULT_FG_SECONDS | The number of seconds allotted to foreground tasks. Default value for $server_options.fg_seconds. |
-| DEFAULT_BG_SECONDS | The number of seconds allotted to background tasks. Default value for $server_options.bg_seconds. |
-| DEFAULT_CONNECT_TIMEOUT | Default value for $server_options.connect_timeout. |
-| LOG_CODE_CHANGES | Write to the log file who changed what verb code. |
-| USE_ANCESTOR_CACHE | Determine if the server should cache the ancestors of objects to improve performance of property lookups. |
-| OWNERSHIP_QUOTA | Control whether or not the server's default ownership quota management is enabled or not. It defaults to disabled to allow the database to handle quota on its own. |
-| UNSAFE_FIO | This allows you to skip the character by character line verification for a small performance boost. Make sure to read the disclaimer above it in options.h. |
-| LOG_EVALS | Allow all evals to be written to the server log. |
-| MEMO_STRLEN | Improve performance of string comparisons by using the pre-computed length of strings to rule out equality before doing a character by character comparison. |
-| NO_NAME_LOOKUP | When enabled, the server won't attempt to perform a DNS name lookup on any new connections.  |
-| INCLUDE_RT_VARS | Allow for retrieval of runtime environment variables from a running task, unhandled exceptions or timeouts, and lagging tasks via `handle_uncaught_error`, `handle_task_timeout`, and `handle_lagging_task`, respectively. To control automatic inclusion of runtime environment variables, set the INCLUDE_RT_VARS server option. Variables will be added to the end of the stack frame as a map. |
-| PCRE_PATTERN_CACHE_SIZE | Specifies how many PCRE patterns are cached. |
-| SAFE_RECYCLE | Change ownership of everything an object owns before recycling it. |
-| DEFAULT_THREAD_MODE | Set the default thread mode for threaded functions. |
-| TOTAL_BACKGROUND_THREADS | Number of threads created at runtime. |
-| SAVE_FINISHED_TASKS | Enabled the `finished_tasks` function and define how many tasks get saved by default. |
-| DEFAULT_LAG_THRESHOLD | The number of seconds allowed before a task is considered laggy and triggers `#0:handle_lagging_task`. |
-| MAX_LINE_BYTES | Unceremoniously close connections that send lines exceeding this value to prevent memory allocation panics. |
-| ONLY_32_BITS | Switch from 64bits back to 32bits. |
+| Option                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NETWORK_PROTOCOL         | This specifies the underlying protocol for the server to use for all connections and will be one of the following:<br>`NP_TCP` The server uses TCP/IP protocols. <br> `NP_LOCAL` The server uses local interprocess communication mechanisms (currently either BSD UNIX-domain sockets or SYSV named pipes).<br>`NP_SINGLE` The server accepts only a single `connection` via the standard input and output streams of the server itself. Attempts to have multiple simultaneous listening points (via listen() will likewise fail. |
+| DEFAULT_PORT             | (for NP_TCP) the TCP port number on which the server listens when no port-number argument is given on the command line.                                                                                                                                                                                                                                                                                                                                                                                                             |
+| DEFAULT_CONNECT_FILE     | (for NP_LOCAL) the local filename through which the server will listen for connections when no connect-file-name is given on the command line.                                                                                                                                                                                                                                                                                                                                                                                      |
+| OUTBOUND_NETWORK         | The server will include support for open_network_connection() if this constant is defined. If given a zero value, the function will be disabled by default and `-o` will need to be specified on the command line in order to enable it, otherwise (nonzero or blank value) the function is enabled by default and `-O` will needed to disable it. When disabled or not supported, open_network_connection() raises E_PERM whenever it is called. The NETWORK_PROTOCOL must be NP_TCP.                                              |
+| MAX_QUEUED_OUTPUT        | The maximum number of output characters the server is willing to buffer for any given network connection before discarding old output to make way for new. This can be overridden in-database by adding the property `$server_options.max_queued_output` and calling `load_server_options()`.                                                                                                                                                                                                                                       |
+| MAX_QUEUED_INPUT         | The maximum number of input characters the server is willing to buffer from any given network connection before it stops reading from the connection at all.                                                                                                                                                                                                                                                                                                                                                                        |
+| IGNORE_PROP_PROTECTED    | Disables protection of builtin properties via $server_options.protect_property when set. See section Protected Properties.                                                                                                                                                                                                                                                                                                                                                                                                          |
+| OUT_OF_BAND_PREFIX       | Specifies the out-of-band prefix. If this is defined as a non-empty string, then any lines of input from any player that begin with that prefix will not be consumed by reading tasks and will not undergo normal command parsing. See section Out-of-band Processing.                                                                                                                                                                                                                                                              |
+| OUT_OF_BAND_QUOTE_PREFIX | Specifies the out-of-band quoting prefix. If this is defined as a non-empty string, then any lines of input from any player that begin with that prefix will have that prefixed stripped and the resulting string will bypass Out-of-Band Processing.                                                                                                                                                                                                                                                                               |
+| DEFAULT_MAX_STACK_DEPTH  | Default value for $server_options.max_stack_depth.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| DEFAULT_FG_TICKS         | The number of ticks allotted to foreground tasks. Default value for $server_options.fg_ticks.                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| DEFAULT_BG_TICKS         | The number of ticks allotted to background tasks. Default value for $server_options.bg_ticks.                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| DEFAULT_FG_SECONDS       | The number of seconds allotted to foreground tasks. Default value for $server_options.fg_seconds.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| DEFAULT_BG_SECONDS       | The number of seconds allotted to background tasks. Default value for $server_options.bg_seconds.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| DEFAULT_CONNECT_TIMEOUT  | Default value for $server_options.connect_timeout.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| LOG_CODE_CHANGES         | Write to the log file who changed what verb code.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| USE_ANCESTOR_CACHE       | Determine if the server should cache the ancestors of objects to improve performance of property lookups.                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| OWNERSHIP_QUOTA          | Control whether or not the server's default ownership quota management is enabled or not. It defaults to disabled to allow the database to handle quota on its own.                                                                                                                                                                                                                                                                                                                                                                 |
+| UNSAFE_FIO               | This allows you to skip the character by character line verification for a small performance boost. Make sure to read the disclaimer above it in options.h.                                                                                                                                                                                                                                                                                                                                                                         |
+| LOG_EVALS                | Allow all evals to be written to the server log.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| MEMO_STRLEN              | Improve performance of string comparisons by using the pre-computed length of strings to rule out equality before doing a character by character comparison.                                                                                                                                                                                                                                                                                                                                                                        |
+| NO_NAME_LOOKUP           | When enabled, the server won't attempt to perform a DNS name lookup on any new connections.                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| INCLUDE_RT_VARS          | Allow for retrieval of runtime environment variables from a running task, unhandled exceptions or timeouts, and lagging tasks via `handle_uncaught_error`, `handle_task_timeout`, and `handle_lagging_task`, respectively. To control automatic inclusion of runtime environment variables, set the INCLUDE_RT_VARS server option. Variables will be added to the end of the stack frame as a map.                                                                                                                                  |
+| PCRE_PATTERN_CACHE_SIZE  | Specifies how many PCRE patterns are cached.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| SAFE_RECYCLE             | Change ownership of everything an object owns before recycling it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| DEFAULT_THREAD_MODE      | Set the default thread mode for threaded functions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| TOTAL_BACKGROUND_THREADS | Number of threads created at runtime.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| SAVE_FINISHED_TASKS      | Enabled the `finished_tasks` function and define how many tasks get saved by default.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| DEFAULT_LAG_THRESHOLD    | The number of seconds allowed before a task is considered laggy and triggers `#0:handle_lagging_task`.                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| MAX_LINE_BYTES           | Unceremoniously close connections that send lines exceeding this value to prevent memory allocation panics.                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ONLY_32_BITS             | Switch from 64bits back to 32bits.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | CURL_TIMEOUT | Specify the maximum amount of time a CURL request can take before failing. |
 
 #### Running the Server
@@ -6178,25 +6179,25 @@ The server command line has the following general form:
  	
 `./moo [-e] [-f script-file] [-c script-line] [-l log-file] [-m] [-w waif-type] [-O|-o] [-4 ipv4-address] [-6 ipv6-address] [-r certificate-path] [-k key-path] [-i files-path] [-x executables-path] input-db-file output-db-file [-t|-p port-number]`
 
-| Option | Description |
-| ------------- | ------------- |
-| -v, --version | current version
-| -h, --help | show usage information and command-line options
-| -e, --emergency | emergency wizard mode
-| -l, --log | redirect standard output to log file
-| -m, --clear-move | clear the `last_move' builtin property on all objects
-| -w, --waif-type |convert waifs from the specified type (check with typeof(waif) in your old MOO)
-| -f, --start-script | file to load and pass to `#0:do_start_script()'
-| -c, --start-line | line to pass to `#0:do_start_script()'
-| -i, --file-dir | directory to look for files for use with FileIO functions
-| -x, --exec-dir | directory to look for executables for use with the exec() function
-| -o, --outbound | enable outbound network connections
-| -O, --no-outbound | disable outbound network connections
-| -4, --ipv4 | restrict IPv4 listeners to a specific address
-| -6, --ipv6 | restrict IPv6 listeners to a specific address
-| -r, --tls-cert | TLS certificate to use
-| -k, --tls-key | TLS key to use
-| -t, --tls-port | port to listen for TLS connections on (can be used multiple times)
+| Option             | Description                                                                     |
+| ------------------ | ------------------------------------------------------------------------------- |
+| -v, --version      | current version                                                                 |
+| -h, --help         | show usage information and command-line options                                 |
+| -e, --emergency    | emergency wizard mode                                                           |
+| -l, --log          | redirect standard output to log file                                            |
+| -m, --clear-move   | clear the `last_move' builtin property on all objects                           |
+| -w, --waif-type    | convert waifs from the specified type (check with typeof(waif) in your old MOO) |
+| -f, --start-script | file to load and pass to `#0:do_start_script()'                                 |
+| -c, --start-line   | line to pass to `#0:do_start_script()'                                          |
+| -i, --file-dir     | directory to look for files for use with FileIO functions                       |
+| -x, --exec-dir     | directory to look for executables for use with the exec() function              |
+| -o, --outbound     | enable outbound network connections                                             |
+| -O, --no-outbound  | disable outbound network connections                                            |
+| -4, --ipv4         | restrict IPv4 listeners to a specific address                                   |
+| -6, --ipv6         | restrict IPv6 listeners to a specific address                                   |
+| -r, --tls-cert     | TLS certificate to use                                                          |
+| -k, --tls-key      | TLS key to use                                                                  |
+| -t, --tls-port     | port to listen for TLS connections on (can be used multiple times)              |
 | -p, --port | port to listen for connections on (can be used multiple times)
 
 The emergency mode switch (-e) may not be used with either the file (-f) or line (-c) options.

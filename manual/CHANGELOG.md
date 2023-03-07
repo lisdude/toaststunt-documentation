@@ -1,5 +1,6 @@
 ## [1.1.1] - 2023.03.07 12:43AM
 * Corrected typos.
+* Format tables for easier viewing in plaintext.
 
 ## [1.1.0] - 2023.03.06 1:29PM
 * Updated README.md to reflect programmers manual
