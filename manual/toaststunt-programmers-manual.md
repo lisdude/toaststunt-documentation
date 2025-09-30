@@ -3780,7 +3780,7 @@ If the third argument is true, `stop` is assumed to be a PARENT. And if any of y
 
 **Function: `occupants`**
 
-list `occupants`(LIST objects [, OBJ | LIST parent, [INT player flag set, [INT inverse-match]]])
+list `occupants`(LIST objects [, OBJ | LIST parent, INT player flag set, INT inverse-match])
 
 Iterates through the list of objects and returns those matching a specific set of criteria:
 
