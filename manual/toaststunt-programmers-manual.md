@@ -16,9 +16,9 @@ Copyright © 2004 by Roger F. Crew.
 
 Copyright © 2011, 2012, 2013, 2014 by Todd Sundsted
 
-Copyright © 2017-2023 by [Brendan Butts](http://github.com/sevenecks).
+Copyright © 2017-2025 by [Brendan Butts](http://github.com/sevenecks).
 
-Copyright © 2021-2023 By [lisdude](http://github.com/lisdude)
+Copyright © 2021-2025 By [lisdude](http://github.com/lisdude)
 
 Portions adapted from the [Stunt Programmers Manual](https://lisdude.com/moo/ProgrammersManual.html) by Todd Sundsted Copyright © 2011, 2012, 2013, 2014 by Todd Sundsted.
 
@@ -3610,13 +3610,15 @@ mapvalues(x, "foo", "baz") => {1, 3}
 ```
 
 **Function: `mapdelete`**
-mapdelete -- Returns a copy of map with the value corresponding to key removed. If key is not a valid key, then E_RANGE is raised.
+mapdelete -- Returns a copy of map with the value corresponding to key(s) removed. If key is not a valid key, then E_RANGE is raised.
 
-map `mapdelete` (map map, key)
+map `mapdelete` (MAP map, key|LIST keys)
 
 ```
 x = ["foo" -> 1, "bar" -> 2, "baz" -> 3];
 mapdelete(x, "bar")   ⇒   ["baz" -> 3, "foo" -> 1]
+
+When passed a list as the second argument, mapdelete() will now delete multiple keys from the map in a single operation. If any key in the list is not found, a descriptive error is raised showing which key was missing.
 ```
 
 **Function: `maphaskey`**
@@ -3778,7 +3780,7 @@ If the third argument is true, `stop` is assumed to be a PARENT. And if any of y
 
 **Function: `occupants`**
 
-list `occupants`(LIST objects [, OBJ | LIST parent, INT player flag set?])
+list `occupants`(LIST objects [, OBJ | LIST parent, INT player flag set, INT inverse-match])
 
 Iterates through the list of objects and returns those matching a specific set of criteria:
 
@@ -3787,6 +3789,10 @@ Iterates through the list of objects and returns those matching a specific set o
 2. If the parent argument is specified, a list of objects descending from parent> will be returned. If parent is a list, object must descend from at least one object in the list.
 
 3. If both parent and player flag set are specified, occupants will check both that an object is descended from parent and also has the player flag set.
+
+4. If the inverse-match is 0 (default behavior). If it is 1, then inverse the match to 'items in the list that do NOT match the parent(s)'
+
+WARNING: As of 2.7.3 this is a threaded function. As with all other threaded functions, using occupants() in situations where it may be called many times, such as in loops, will implicitly suspend the verb akin to how reading input is handled. This may not be what you want! If this is undesirable, use set_thread_mode(0) prior to the function call in your verb.
 
 **Function: `recycle`**
 
@@ -3827,6 +3833,8 @@ ancestors -- Return a list of all ancestors of `object` in order ascending up th
 list `ancestors`(OBJ object [, INT full])
 
 **Function: `clear_ancestor_cache`**
+
+WARNING: This is deprecated and is removed in 2.7.3
 
 void `clear_ancestor_cache`()
 
@@ -4953,6 +4961,19 @@ return full_list;
 
 is a way of getting the full list of intrinsic commands available in the server while leaving the current connection unaffected. 
 
+As of 2.7.1 each connection now has an option to enable TCP keep-alives. These can be configured with set_connection_option by either specifying 1 (to enable and use defaults) or by specifying a map of options. The option keys are: idle, interval, and count. More information on what they do, and default values, can be found in options.h.
+
+Nothing has broken with compatibility. The old way of setting options still exists. Keep alive is an option:   
+```
+set_connection_option(player, "keep-alive", 1);
+```
+
+Or:
+```set_connection_option(player, "keep-alive", ["idle" -> 90, "interval" -> 60]);
+```
+
+Note: If you don't provide one of the 3 options in the map it will default to whatever is in options.h.
+
 **Function: `connection_options`**
 
 connection_options -- returns a list of `{name, value}` pairs describing the current settings of all of the allowed options for the connection conn or the value if `name` is provided
@@ -5004,6 +5025,8 @@ The curl builtin will download a webpage and return it as a string. If include_h
 It's worth noting that the data you get back will be binary encoded. In particular, you will find that line breaks appear as ~0A. You can easily convert a page into a list by passing the return string into the decode_binary() function.
 
 CURL_TIMEOUT is defined in options.h to specify the maximum amount of time a CURL request can take before failing. For special circumstances, you can specify a longer or shorter timeout using the third argument of curl().
+
+As of ToastStunt 2.7.3 curl supports the Dictionary Server (DICT) protocol.
 
 **Function: `read_http`**
 
@@ -5068,6 +5091,8 @@ An optional third argument allows you to set various miscellaneous options for t
 
   key:            The full path to a TLS private key. NOTE: Requires the TLS option also be specified and true. This option is only necessary if the key differs from the one specified in options.h.
 
+  interface:      This allows you to specify the interface to listen on. (Similar to the --ipv4 or --ipv6 command-line arguments.)
+
 listen() raises E_PERM if the programmer is not a wizard, E_INVARG if `object` is invalid or there is already a listening point described by `point`, and E_QUOTA if some network-configuration-specific error occurred.
 
 Example:
@@ -5088,7 +5113,7 @@ Raises `E_PERM` if the programmer is not a wizard and `E_INVARG` if there does n
 
 **Function: `listeners`**
 
-listeners -- returns a list describing all existing listening points, including the default one set up automatically by the server when it was started (unless that one has since been destroyed by a call to `unlisten()`)
+listeners -- returns a list describing all existing listening points, including the default one set up automatically by the server when it was started (unless that one has since been destroyed by a call to `unlisten()`) and the interface being listened on
 
 list `listeners` ()
 
@@ -5832,7 +5857,8 @@ The specific properties searched for are each described in the appropriate secti
 | support_numeric_verbname_strings | Enables use of an obsolete verb-naming mechanism.                                                                                                          |
 | max_queued_output                | The maximum number of output characters the server is willing to buffer for any given network connection before discarding old output to make way for new. |
 | dump_interval                    | an int in seconds for how often to checkpoint the database.                                                                                                |
-| proxy_rewrite                    | control whether IPs from proxies get rewritten.                                                                                                            |
+| proxy_rewrite (removed in 2.7.2)                    | control whether IPs from proxies get rewritten.                                                                                                            |
+| trusted_proxies                  | Any connecting IP found in this list will have the login screen suppressed, and will accept forwarded IP addresses via the HAProxy Proxy protocol, at which point the welcome screen will be printed. To regain the legacy functionality, you can set $server_options.trusted_proxies to {"127.0.0.1", "::1"} |
 | file_io_max_files                | allow DB-changeable limits on how many files can be opened at once.                                                                                        |
 | sqlite_max_handles               | allow DB-changeable limits on how many SQLite connections can be opened at once.                                                                           |
 | task_lag_threshold               | override default task_lag_threshold for handling lagging tasks                                                                                             |
@@ -6198,7 +6224,8 @@ The server command line has the following general form:
 | -r, --tls-cert     | TLS certificate to use                                                          |
 | -k, --tls-key      | TLS key to use                                                                  |
 | -t, --tls-port     | port to listen for TLS connections on (can be used multiple times)              |
-| -p, --port | port to listen for connections on (can be used multiple times)
+| -p, --port         | port to listen for connections on (can be used multiple times)                  |
+| --no-ipv6          | disable the initial IPv6 listener                                               |
 
 The emergency mode switch (-e) may not be used with either the file (-f) or line (-c) options.
 
