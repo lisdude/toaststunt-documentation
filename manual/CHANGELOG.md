@@ -1,3 +1,7 @@
+## [1.2] - 2026.01.12 3:59PM
+* Merged some PRs that had been hanging around for a while, with updates for the newest release of ToastStunt
+* Mostly adding arguments to function definitions and updating the descriptions of those functions to match the current implementations
+
 ## [1.1.1] - 2023.03.07 12:43AM
 * Corrected typos.
 * Format tables for easier viewing in plaintext.
