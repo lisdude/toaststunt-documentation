@@ -1,4 +1,4 @@
-# ToastStunt Programmer's Manual Version 1.1.00
+# ToastStunt Programmer's Manual Version 1.2
 
 ## Written for ToastStunt Version 2.7.0, Last Updated 03/07/23
 
@@ -6293,3 +6293,4 @@ Print the list of commands.
 Note that output from wizard mode commands appears on the server`s standard output stream (stdout) and thus can be redirected independently of the log messages if those are being written to the standard error stream (stderr, i.e., if -l has not been specified on the command line).
 
 Also note that unless the server has been compiled to use the NP_SINGLE networking variant, Emergency Wizard Mode is the only use of the server`s standard input and output streams. 
+
