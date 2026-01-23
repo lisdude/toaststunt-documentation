@@ -16,7 +16,7 @@ Copyright © 2004 by Roger F. Crew.
 
 Copyright © 2011, 2012, 2013, 2014 by Todd Sundsted
 
-Copyright © 2017-2025 by [Brendan Butts](http://github.com/sevenecks).
+Copyright © 2017-2026 by [Brendan Butts](http://github.com/sevenecks).
 
 Copyright © 2021-2025 By [lisdude](http://github.com/lisdude)
 
@@ -680,7 +680,7 @@ At long last, we have a program to run in response to the command typed by the p
 | caller   | an object, the same as <code>player</code>               |
 | verb     | a string, the first word of the command                  |
 | argstr   | a string, everything after the first word of the command |
-| args     | a list of strings, the words in <code>argstr</code>      |
+| args     | a list of strings, the words in <code>argstr</code>, or a list of mixed types containing the arguments the verb was called with      |
 | dobjstr  | a string, the direct object string found during parsing  |
 | dobj     | an object, the direct object value found during matching |
 | prepstr  | a string, the prepositional phrase found during parsing  |
@@ -6293,4 +6293,5 @@ Print the list of commands.
 Note that output from wizard mode commands appears on the server`s standard output stream (stdout) and thus can be redirected independently of the log messages if those are being written to the standard error stream (stderr, i.e., if -l has not been specified on the command line).
 
 Also note that unless the server has been compiled to use the NP_SINGLE networking variant, Emergency Wizard Mode is the only use of the server`s standard input and output streams. 
+
 
