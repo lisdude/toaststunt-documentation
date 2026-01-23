@@ -1,4 +1,7 @@
 ## [1.2] - 2026.01.12 3:59PM
+* Updated the description of the `args` built-in variable to specify it can contain not just a list of strings
+  
+## [1.2] - 2026.01.12 3:59PM
 * Merged some PRs that had been hanging around for a while, with updates for the newest release of ToastStunt
 * Mostly adding arguments to function definitions and updating the descriptions of those functions to match the current implementations
 
