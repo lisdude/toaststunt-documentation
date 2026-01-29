@@ -2639,7 +2639,7 @@ See the description of string_hmac() for details.
 
 generate_json -- Returns the JSON representation of the MOO value.
 
-str generate_json (value [, str mode])
+str generate_json (value [, str mode [, any disable_binary_escapes]])
 
 Returns the JSON representation of the MOO value.
 
@@ -2648,6 +2648,8 @@ MOO supports a richer set of values than JSON allows. The optional mode specifie
 The common subset mode, specified by the literal mode string "common-subset", is the default conversion mode. In this mode, only the common subset of types (strings and numbers) are translated with fidelity between MOO types and JSON types. All other types are treated as alternative representations of the string type. This mode is useful for integration with non-MOO applications.
 
 The embedded types mode, specified by the literal mode string "embedded-types", adds type information. Specifically, values other than strings and numbers, which carry implicit type information, are converted into strings with type information appended. The converted string consists of the string representation of the value (as if tostr() were applied) followed by the pipe (|) character and the type. This mode is useful for serializing/deserializing objects and collections of MOO values.
+
+The optional disable_binary_escapes argument controls whether MOO binary string sequences (like ~08 or ~1F) are converted to JSON escape sequences. By default, these sequences are converted (e.g., ~08 becomes \b). If disable_binary_escapes is true, these sequences pass through unchanged. This is useful when working with literal strings that contain ~0 or ~1 followed by hexadecimal digits.
     
 ```
 generate_json([])                                           =>  "{}"
@@ -2672,6 +2674,15 @@ generate_json([1 -> 2])                                     =>  "{\"1\":2}"
 generate_json([1 -> 2], "common-subset")                    =>  "{\"1\":2}"
 generate_json([1 -> 2], "embedded-types")                   =>  "{\"1|int\":2}"
 generate_json([#1 -> 2], "embedded-types")                  =>  "{\"#1|obj\":2}"
+```
+
+Binary string escape processing examples:
+
+```
+generate_json(["foo" -> "bar~08baz"])                       =>  "{\"foo\":\"bar\\bbaz\"}"
+generate_json(["foo" -> "bar~08baz"], "common-subset", 0)   =>  "{\"foo\":\"bar\\bbaz\"}"
+generate_json(["foo" -> "bar~08baz"], "common-subset", 1)   =>  "{\"foo\":\"bar~08baz\"}"
+generate_json(["foo" -> "Hoodie (~1.5k)"])                  =>  "{\"foo\":\"Hoodie (~1.5k)\"}"
 ```
 
 > Warning: generate_json does not support WAIF or ANON types.

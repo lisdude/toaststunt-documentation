@@ -1,3 +1,6 @@
+## [1.2.2] - 2026.01.28
+* Updated `generate_json()` to document the optional third argument for disabling binary string escape processing
+
 ## [1.2.1] - 2026.01.12 3:59PM
 * Updated the description of the `args` built-in variable to specify it can contain not just a list of strings
   
