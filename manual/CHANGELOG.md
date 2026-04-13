@@ -1,3 +1,6 @@
+## 1.2.3 - 2026.04.13
+* Added sqlite_open parse types note to prevent confusion
+
 ## [1.2.2] - 2026.01.28
 * Updated `generate_json()` to document the optional third argument for disabling binary string escape processing
 

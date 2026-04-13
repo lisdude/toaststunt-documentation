@@ -1,4 +1,4 @@
-# ToastStunt Programmer's Manual Version 1.2.1
+# ToastStunt Programmer's Manual Version 1.2.3
 
 ## Written for ToastStunt Version 2.7+
 
@@ -4533,6 +4533,8 @@ SQLITE_PARSE_OBJECTS [4]:    Determines whether strings beginning with a pound s
 SQLITE_PARSE_TYPES [2]:      If unset, no parsing of rows takes place and only strings are returned.
 
 SQLITE_SANITIZE_STRINGS [8]: If set, newlines (\n) are converted into tabs (\t) to avoid corrupting the MOO database. Default is unset.
+
+> Note: For the SQLITE_PARSE_TYPES option, the types which will be parsed by that option are INT and FLOAT. LISTS/MAPS/WAIFS/ANONS will hit the db as "NULL"
 
 > Note: If the MOO doesn't support bitmasking, you can still specify options. You'll just have to manipulate the int yourself. e.g. if you want to parse objects and types, arg[2] would be a 6. If you only want to parse types, arg[2] would be 2.
 
