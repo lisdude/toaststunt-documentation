@@ -3591,7 +3591,17 @@ sort({"foo", "bar", "baz"}, {123, 5, 8000}) => {"bar", "foo", "baz"}
 
 ##### Operations on Maps
 
-When using the functions below, it's helpful to remember that maps are ordered.
+Maps are ordered by their keys, not by the order in which entries were inserted. Functions that walk a whole map, such as `mapkeys()` and `mapvalues()`, return entries in this key order. Keys of the same type are ordered by their natural comparison: numbers numerically, object numbers by object id, errors by error value, and strings lexically. String keys are normally compared case-insensitively, so keys that differ only by case are treated as the same key for ordinary map access. Keys of different types are grouped by the server's internal type order; this is deterministic, but usually should not be used as a meaningful application-level ordering.
+
+For example:
+
+```
+x = [3 -> "three", 1 -> "one", "foo" -> 4, "bar" -> 5];
+mapkeys(x)   => {1, 3, "bar", "foo"}
+mapvalues(x) => {"one", "three", 5, 4}
+```
+
+If you need insertion order, display order, or some other custom ordering, keep that order in a separate list or sort the keys explicitly.
 
 **Function: `mapkeys`**
 
