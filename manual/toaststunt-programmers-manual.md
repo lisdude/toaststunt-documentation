@@ -1,6 +1,6 @@
-# ToastStunt Programmer's Manual Version 1.2.3
+# ToastStunt Programmer's Manual Version 1.2.4
 
-## Written for ToastStunt Version 2.7+
+## Written for ToastStunt Version 2.8+
 
 by Pavel Curtis et al
 
@@ -2222,7 +2222,9 @@ Anonymous objects can be stored in maps as either the key or the value:
 
 > Warning: \*anonymous\* is not the actual key, there is not literal representation of an anonymous object reference. This means that while the object will continue to exist while it is a key of a map, the only way to reference that key would be by the reference, which you would need to store in a variable or a property. This is NOT a recommended practice, as you would have to keep a reference to the key elsewhere in order to access it (outside of iterating over all the keys).
 
-Anonymous objects technically have a player flag and children lists, but you can't actually do anything with them. Same with the majority of the properties. They exist but are meaningless. Generally speaking, this makes WAIFs a better choice in most situations, as they are lighter weight.
+Anonymous objects technically have a player flag and children lists, but you can't actually do anything with them. Same with the majority of the built-in properties. They exist but are meaningless. You also cannot add new properties or verbs directly to an anonymous object. Generally speaking, this makes WAIFs a better choice in most situations, as they are lighter weight.
+
+As of ToastStunt 2.8.0, anonymous objects that inherit from a parent are no longer invalidated merely because that parent's properties change.
 
 > Warning: Similar to WAIFs, you want to take care in how you are creating Anonymous Objects, as once they are created, if you continue to reference them in a property, you may have trouble finding them in the future, as there is no way to pull up a list of all Anonymous Objects. 
 
@@ -2722,7 +2724,11 @@ parse_json("{\"1|int\":2}", "embedded-types")               =>   [1 -> 2]
 parse_json("{\"#1|obj\":2}", "embedded-types")              =>   [#1 -> 2]
 ```
 
-> Note: JSON converts `null` to the string "null". 
+JSON `null` values are converted to `E_NONE`.
+
+```
+parse_json("{\"foo\":null}")                                =>   ["foo" -> E_NONE]
+```
 
 > Warning: WAIF and ANON types are not supported.
 
@@ -3151,13 +3157,15 @@ ToastCore offers two primary methods of interacting with regular expressions.
 
 **Function: `pcre_match`**
 
-pcre_match -- The function `pcre_match()` searches `subject` for `pattern` using the Perl Compatible Regular Expressions library. 
+pcre_match -- The function `pcre_match()` searches `subject` for `pattern` using the Perl Compatible Regular Expressions library. ToastStunt uses PCRE2 for this functionality.
 
 LIST `pcre_match`(STR subject, STR pattern [, ?case matters=0] [, ?repeat until no matches=1])
 
 The return value is a list of maps containing each match. Each returned map will have a key which corresponds to either a named capture group or the number of the capture group being matched. The full match is always found in the key "0". The value of each key will be another map containing the keys 'match' and 'position'. Match corresponds to the text that was matched and position will return the indices of the substring within `subject`.
 
 If `repeat until no matches` is 1, the expression will continue to be evaluated until no further matches can be found or it exhausts the iteration limit. This defaults to 1.
+
+Empty subjects are valid. If the pattern does not match the empty string, the result is an empty list.
 
 Additionally, wizards can control how many iterations of the loop are possible by adding a property to $server_options. $server_options.pcre_match_max_iterations is the maximum number of loops allowed before giving up and allowing other tasks to proceed. CAUTION: It's recommended to keep this value fairly low. The default value is 1000. The minimum value is 100.
 
@@ -3181,11 +3189,11 @@ Explode a string (albeit a contrived example):
 
 **Function: `pcre_replace`**
 
-pcre_replace -- The function `pcre_replace()` replaces `subject` with replacements found in `pattern` using the Perl Compatible Regular Expressions library.
+pcre_replace -- The function `pcre_replace()` replaces `subject` with replacements found in `pattern` using the Perl Compatible Regular Expressions library. ToastStunt uses PCRE2 for this functionality.
 
 STR `pcre_replace` (STR `subject`, STR `pattern`)
 
-The pattern string has a specific format that must be followed, which should be familiar if you have used the likes of Vim, Perl, or sed. The string is composed of four elements, each separated by a delimiter (typically a slash (/) or an exclamation mark (!)), that tell PCRE how to parse your replacement. We'll break the string down and mention relevant options below:
+The pattern string has a specific format that must be followed, which should be familiar if you have used the likes of Vim, Perl, or sed. The string is composed of four elements, each separated by a delimiter (typically a slash (/) or an exclamation mark (!)), that tell the regular expression engine how to parse your replacement. We'll break the string down and mention relevant options below:
 
 1. Type of search to perform. In MOO, only 's' is valid. This parameter is kept for the sake of consistency.
 
@@ -3779,7 +3787,7 @@ locate_by_name -- This function searches every object in the database for those 
 
 list `locate_by_name` (STR object name)
 
-> Warning: Take care when using this when thread mode is active, as this is a threaded function and that means it implicitly suspends. `set_thread_mode(0)` if you want to use this without suspending.
+As of ToastStunt 2.8.0, this is not a threaded function.
 
 **Function: `locations`**
 
@@ -3813,7 +3821,7 @@ Iterates through the list of objects and returns those matching a specific set o
 
 4. If the inverse-match is 0 (default behavior). If it is 1, then inverse the match to 'items in the list that do NOT match the parent(s)'
 
-WARNING: As of 2.7.3 this is a threaded function. As with all other threaded functions, using occupants() in situations where it may be called many times, such as in loops, will implicitly suspend the verb akin to how reading input is handled. This may not be what you want! If this is undesirable, use set_thread_mode(0) prior to the function call in your verb.
+As of ToastStunt 2.8.0, this is not a threaded function.
 
 **Function: `recycle`**
 
@@ -3968,9 +3976,9 @@ add_property -- Defines a new property on the given object
 
 none `add_property` (obj object, str prop-name, value, list info)
 
-The property is inherited by all of its descendants; the property is named prop-name, its initial value is value, and its owner and initial permission bits are given by info in the same format as is returned by `property_info()`, described above.
+The property is inherited by all of its descendants; the property is named prop-name, its initial value is value, and its owner and initial permission bits are given by info in the same format as is returned by `property_info()`, described above. The object argument must be a permanent object; anonymous objects cannot have new properties added directly to them.
 
-If object is not valid or info does not specify a valid owner and well-formed permission bits or object or its ancestors or descendants already defines a property named prop-name, then `E_INVARG` is raised. If the programmer does not have write permission on object or if the owner specified by info is not the programmer and the programmer is not a wizard, then `E_PERM` is raised.
+If object is not a permanent object, then `E_TYPE` is raised. If object is not valid or info does not specify a valid owner and well-formed permission bits or object or its ancestors or descendants already defines a property named prop-name, then `E_INVARG` is raised. If the programmer does not have write permission on object or if the owner specified by info is not the programmer and the programmer is not a wizard, then `E_PERM` is raised.
 
 **Function: `delete_property`**
 
@@ -4079,9 +4087,9 @@ add_verb -- defines a new verb on the given object
 
 none `add_verb` (obj object, list info, list args)
 
-The new verb's owner, permission bits and name(s) are given by info in the same format as is returned by `verb_info()`, described above. The new verb's direct-object, preposition, and indirect-object specifications are given by args in the same format as is returned by `verb_args`, described above. The new verb initially has the empty program associated with it; this program does nothing but return an unspecified value.
+The new verb's owner, permission bits and name(s) are given by info in the same format as is returned by `verb_info()`, described above. The new verb's direct-object, preposition, and indirect-object specifications are given by args in the same format as is returned by `verb_args`, described above. The new verb initially has the empty program associated with it; this program does nothing but return an unspecified value. The object argument must be a permanent object; anonymous objects cannot have new verbs added directly to them.
 
-If object is not valid, or info does not specify a valid owner and well-formed permission bits and verb names, or args is not a legitimate syntax specification, then `E_INVARG` is raised. If the programmer does not have write permission on object or if the owner specified by info is not the programmer and the programmer is not a wizard, then `E_PERM` is raised.
+If object is not a permanent object, then `E_TYPE` is raised. If object is not valid, or info does not specify a valid owner and well-formed permission bits and verb names, or args is not a legitimate syntax specification, then `E_INVARG` is raised. If the programmer does not have write permission on object or if the owner specified by info is not the programmer and the programmer is not a wizard, then `E_PERM` is raised.
 
 **Function: `delete_verb`**
 
@@ -5015,9 +5023,9 @@ obj `open_network_connection` (STR host, INT port [, MAP options])
 
 Establishes a network connection to the place specified by the arguments and more-or-less pretends that a new, normal player connection has been established from there.  The new connection, as usual, will not be logged in initially and will have a negative object number associated with it for use with `read()', `notify()', and `boot_player()'.  This object number is the value returned by this function.
 
-If the programmer is not a wizard or if the `OUTBOUND_NETWORK' compilation option was not used in building the server, then `E_PERM' is raised.
+If the programmer is not a wizard or if the `OUTBOUND_NETWORK' compilation option was not used in building the server, then `E_PERM' is raised. If outbound networking support is present but disabled at runtime, `E_PERM` is raised with a value indicating that outbound network connections are disabled.
 
-`host` refers to a string naming a host (possibly a numeric IP address) and `port` is an integer referring to a TCP port number.  If a connection cannot be made because the host does not exist, the port does not exist, the host is not reachable or refused the connection, `E_INVARG' is raised.  If the connection cannot be made for other reasons, including resource limitations, then `E_QUOTA' is raised.
+`host` refers to a string naming a host (possibly a numeric IP address) and `port` is an integer referring to a TCP port number. If a connection cannot be made because the host does not exist, the port does not exist, the host is not reachable or refused the connection, `E_INVARG' is raised. If the connection cannot be made for other reasons, including resource limitations, then `E_QUOTA' is raised. When these errors are caught, the error value may include more specific diagnostic information such as address lookup, socket, connection, or TLS failure details.
 
 Optionally, you can specify a map with any or all of the following options:
 
@@ -5026,6 +5034,8 @@ Optionally, you can specify a map with any or all of the following options:
   tls:      If true, establish a secure TLS connection.
 
   ipv6:     If true, utilize the IPv6 protocol rather than the IPv4 protocol.
+
+When opening an outbound TLS connection, ToastStunt sends Server Name Indication (SNI) using the supplied host name.
 
 The outbound connection process involves certain steps that can take quite a long time, during which the server is not doing anything else, including responding to user commands and executing MOO tasks.  See the chapter on server assumptions about the database for details about how the server limits the amount of time it will wait for these steps to successfully complete.
 
@@ -5041,9 +5051,11 @@ Open a new connection to the IPv6 address 2607:5300:60:4be0:: on port 1234 using
 
 **Function: `curl`**
 
-str `curl`(STR url [, INT include_headers, [ INT timeout])
+str `curl` (STR url [, INT include_headers [, INT timeout]])
 
 The curl builtin will download a webpage and return it as a string. If include_headers is true, the HTTP headers will be included in the return string.
+
+If outbound networking is disabled at runtime, `curl()` raises `E_PERM` with a value indicating that outbound network connections are disabled.
 
 It's worth noting that the data you get back will be binary encoded. In particular, you will find that line breaks appear as ~0A. You can easily convert a page into a list by passing the return string into the decode_binary() function.
 
@@ -5128,7 +5140,7 @@ Listen for IPv6 connections on port 1234 and print messages as appropriate. Thes
 
 **Function: `unlisten`**
 
-unlisten -- stop listening for connections on the point described by canon, which should be the second element of some element of the list returned by `listeners()`
+unlisten -- stop listening for connections on the point described by canon, which should match the `port` value from an element of the list returned by `listeners()`
 
 none `unlisten` (canon)
 
@@ -5136,22 +5148,27 @@ Raises `E_PERM` if the programmer is not a wizard and `E_INVARG` if there does n
 
 **Function: `listeners`**
 
-listeners -- returns a list describing all existing listening points, including the default one set up automatically by the server when it was started (unless that one has since been destroyed by a call to `unlisten()`) and the interface being listened on
+listeners -- returns a list describing existing listening points, including the default one set up automatically by the server when it was started (unless that one has since been destroyed by a call to `unlisten()`)
 
-list `listeners` ()
+list `listeners` ([obj-or-port])
 
-Each element of the list has the following form:
+If an object or port is supplied, only matching listeners are returned. Each element of the returned list is a map with the following keys:
 
-```
-{object, canon, print-messages}
-```
+| Key              | Value                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------- |
+| object           | The object whose listener verbs are called.                                                  |
+| port             | The port or listener descriptor.                                                             |
+| print-messages   | True if database-configurable messages are printed for this listener.                        |
+| ipv6             | True if this listener uses IPv6.                                                             |
+| interface        | The interface being listened on.                                                             |
+| tls              | True if this listener uses TLS. This key is only present when ToastStunt has TLS support.     |
 
-where object is the first argument given in the call to `listen()` to create this listening point, print-messages is true if the third argument in that call was provided and true, and canon was the value returned by that call. (For the initial listening point, object is `#0`, canon is determined by the command-line arguments or a network-configuration-specific default, and print-messages is true.)
+For the initial listening point, object is `#0`, port is determined by the command-line arguments or a network-configuration-specific default, and print-messages is true.
 
 Please note that there is nothing special about the initial listening point created by the server when it starts; you can use `unlisten()` on it just as if it had been created by `listen()`. This can be useful; for example, under one of the TCP/IP configurations, you might start up your server on some obscure port, say 12345, connect to it by yourself for a while, and then open it up to normal users by evaluating the statements:
 
 ```
-unlisten(12345); listen(#0, 7777, 1)
+unlisten(12345); listen(#0, 7777, ["print-messages" -> 1])
 ```
 
 ##### Operations Involving Times and Dates
@@ -5627,16 +5644,6 @@ none `dump_database` ()
 
 It is not normally necessary to call this function; the server automatically checkpoints the database at regular intervals; see the chapter on server assumptions about the database for details. If the programmer is not a wizard, then `E_PERM` is raised.
 
-**Function: `panic`**
-
-panic -- Unceremoniously shut down the server, mimicking the behavior of a fatal error.
-
-void panic([STR message])
-
-The database will NOT be dumped to the file specified when starting the server. A new file will be created with the name of your database appended with .PANIC.
-
-> Warning: Don't run this unless you really want to panic your server.
-
 **Function: `db_disk_size`**
 
 db_disk_size -- returns the total size, in bytes, of the most recent full representation of the database as one or more disk files
@@ -5685,9 +5692,13 @@ exec({"echo", "one", "two"})                             {0, "one two~0A", ""}
 
 shutdown -- requests that the server shut itself down at its next opportunity
 
-none `shutdown` ([str message])
+none `shutdown` ([str message [, any unclean_shutdown]])
 
 Before doing so, a notice (incorporating message, if provided) is printed to all connected players. If the programmer is not a wizard, then `E_PERM` is raised.
+
+If unclean_shutdown is false or not provided, the server performs a normal clean shutdown and saves the database as usual.
+
+If unclean_shutdown is true, the server performs an unclean shutdown, mimicking the behavior of a fatal error. The database is not dumped to the normal output database file; a panic database file is created instead. The shutdown message is also written to the server log.
 
 **Function: `verb_cache_stats`**
 
@@ -5880,8 +5891,8 @@ The specific properties searched for are each described in the appropriate secti
 | support_numeric_verbname_strings | Enables use of an obsolete verb-naming mechanism.                                                                                                          |
 | max_queued_output                | The maximum number of output characters the server is willing to buffer for any given network connection before discarding old output to make way for new. |
 | dump_interval                    | an int in seconds for how often to checkpoint the database.                                                                                                |
-| proxy_rewrite (removed in 2.7.2)                    | control whether IPs from proxies get rewritten.                                                                                                            |
-| trusted_proxies                  | Any connecting IP found in this list will have the login screen suppressed, and will accept forwarded IP addresses via the HAProxy Proxy protocol, at which point the welcome screen will be printed. To regain the legacy functionality, you can set $server_options.trusted_proxies to {"127.0.0.1", "::1"} |
+| proxy_rewrite (removed in 2.7.2) | Formerly controlled whether IPs from proxies were rewritten. Proxy rewriting is no longer enabled by default. |
+| trusted_proxies                  | A list of trusted proxy IP address strings. Any connecting IP found in this list will have the login screen suppressed and will accept forwarded IP addresses via the HAProxy Proxy protocol, at which point the welcome screen will be printed. This property may be defined on `$server_options` or on the listening object itself. To regain the legacy localhost proxy behavior, set `$server_options.trusted_proxies` to `{"127.0.0.1", "::1"}`. |
 | file_io_max_files                | allow DB-changeable limits on how many files can be opened at once.                                                                                        |
 | sqlite_max_handles               | allow DB-changeable limits on how many SQLite connections can be opened at once.                                                                           |
 | task_lag_threshold               | override default task_lag_threshold for handling lagging tasks                                                                                             |
@@ -6212,7 +6223,7 @@ Network Options
 | MEMO_STRLEN              | Improve performance of string comparisons by using the pre-computed length of strings to rule out equality before doing a character by character comparison.                                                                                                                                                                                                                                                                                                                                                                        |
 | NO_NAME_LOOKUP           | When enabled, the server won't attempt to perform a DNS name lookup on any new connections.                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | INCLUDE_RT_VARS          | Allow for retrieval of runtime environment variables from a running task, unhandled exceptions or timeouts, and lagging tasks via `handle_uncaught_error`, `handle_task_timeout`, and `handle_lagging_task`, respectively. To control automatic inclusion of runtime environment variables, set the INCLUDE_RT_VARS server option. Variables will be added to the end of the stack frame as a map.                                                                                                                                  |
-| PCRE_PATTERN_CACHE_SIZE  | Specifies how many PCRE patterns are cached.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| PCRE_PATTERN_CACHE_SIZE  | Specifies how many PCRE2 patterns are cached for `pcre_match()` and related regular expression operations.                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | SAFE_RECYCLE             | Change ownership of everything an object owns before recycling it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | DEFAULT_THREAD_MODE      | Set the default thread mode for threaded functions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | TOTAL_BACKGROUND_THREADS | Number of threads created at runtime.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
