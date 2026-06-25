@@ -4638,7 +4638,7 @@ This is implemented using chmod().
 
 ##### Operations on SQLite
 
-SQLite allows you to store information in locally hosted SQLite databases.
+SQLite allows you to store information in locally hosted SQLite databases. These built-ins are available only when ToastStunt is built with SQLite support.
 
 All SQLite built-in functions require wizard permissions. If the programmer is not a wizard, then `E_PERM` is raised.
 
@@ -4682,6 +4682,8 @@ On success, this function will return a list identifying the returned rows. If t
 
 If the query fails, a string will be returned identifying the SQLite error message.
 
+If database handle is invalid, `E_INVARG` is returned.
+
 `sqlite_execute` uses prepared statements, so it's the preferred function to use for security and performance reasons.
 
 Example:
@@ -4690,7 +4692,7 @@ Example:
 sqlite_execute(0, "INSERT INTO users VALUES (?, ?, ?);", {#7, "lisdude", "Albori Sninvel"})
 ```
 
-ToastStunt supports the REGEXP pattern matching operator:
+When ToastStunt is built with PCRE2 support, SQLite queries support the REGEXP pattern matching operator:
 
 ```
 sqlite_execute(4, "SELECT rowid FROM notes WHERE body REGEXP ?;", {"albori (sninvel)?"})
@@ -4707,6 +4709,8 @@ list | str `sqlite_query`(INT database handle, STR database query[, INT show col
 On success, this function will return a list identifying the returned rows. If the query didn't return rows but was successful, an empty list is returned.
 
 If the query fails, a string will be returned identifying the SQLite error message.
+
+If database handle is invalid, `E_INVARG` is returned.
 
 If show columns is true, the return list will include the name of the column before its results.
 
@@ -4751,6 +4755,8 @@ sqlite_last_insert_row_id -- This function identifies the row ID of the last ins
 
 int `sqlite_last_insert_row_id`(INT database handle)
 
+If database handle is invalid, then `E_INVARG` is raised.
+
 **Function: `sqlite_interrupt`**
 
 sqlite_interrupt -- This function causes any pending database operation to abort at its earliest opportunity.
@@ -4760,6 +4766,8 @@ none `sqlite_interrupt`(INT database handle)
 If the operation is nearly finished when sqlite_interrupt is called, it might not have an opportunity to be interrupted and could continue to completion.
 
 This can be useful when you execute a long-running query and want to abort it.
+
+If database handle is invalid, then `E_INVARG` is raised.
 
 > NOTE: As of this writing (server version 2.7.0) the @kill command WILL NOT abort operations taking place in a helper thread. If you want to interrupt an SQLite query, you must use sqlite_interrupt and NOT the @kill command.
 
@@ -4978,7 +4986,7 @@ map `connection_info` (OBJ `connection`)
 | source_port         | The local port a connection connected to. For outbound connections, this value is meaningless.                                                                                                 |
 | protocol            | Describes the protocol used to make the connection. At the time of writing, this could be IPv4 or IPv6.                                                                                        |
 | outbound            | Indicates whether a connection is outbound or not                                                                                                                                                         |
-| tls                 | TLS connection information, when ToastStunt was built with TLS support                                                                                                                                    |
+| tls                 | TLS connection information. This key is present only when ToastStunt was built with `USE_TLS` support.                                                                                                     |
 
 If connection is not valid or is disconnecting, then `E_INVARG` is raised. If the programmer is not a wizard and is not connection, then `E_PERM` is raised.
 
@@ -5643,7 +5651,7 @@ finished_tasks -- returns a list of the last X tasks to finish executing, includ
 
 list `finished_tasks`()
 
-When enabled (via SAVE_FINISHED_TASKS in options.h), the server will keep track of the execution time of every task that passes through the interpreter. This data is then made available to the database in two ways.
+When enabled (via `SAVE_FINISHED_TASKS` in options.h), the server will keep track of the execution time of every task that passes through the interpreter. The `finished_tasks()` built-in is registered only in builds with `SAVE_FINISHED_TASKS` enabled. If the programmer is not a wizard, then `E_PERM` is raised. This data is then made available to the database in two ways.
 
 The first is the finished_tasks() function. This function will return a list of maps of the last several finished tasks (configurable via $server_options.finished_tasks_limit) with the following information:
 
@@ -5657,7 +5665,8 @@ The first is the finished_tasks() function. This function will return a list of 
 | receiver   | typically the same as 'this' but could be the handler in the case of primitive values |
 | suspended  | whether the task was suspended or not                                                 |
 | this       | the actual object the verb was called on                                              |
-| time | the total time it took the verb to run), and verb (the name of the verb call or command typed |
+| time       | the total time it took the verb to run inside the interpreter                         |
+| verb       | the name of the verb call or command typed                                           |
 
 The second is via the $handle_lagging_task verb. When the execution threshold defined in $server_options.task_lag_threshold is exceeded, the server will write an entry to the log file and call the $handle_lagging_task verb with the call stack of the task as well as the execution time.
 
