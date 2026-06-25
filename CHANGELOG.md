@@ -10,6 +10,7 @@
 * Removed stale active documentation for unavailable `file_version()`, `clear_ancestor_cache()`, and `thread_info()` builtins
 * Corrected source-audited builtin contracts for `maphaskey()`, `locate_by_name()`, `add_verb()`, SQLite helpers, `connection_info()`, `switch_player()`, `task_local()`, and `set_task_local()`
 * Fixed invalid `set_connection_options()` examples to use `set_connection_option()`
+* Fixed malformed manual signatures, collapsed function headings, and static examples found during the source audit, including `frandom()`, `index()`, `rindex()`, `explode()`, hash helpers, list/set helpers, `move()`, `notify()`, `listen()`, `unlisten()`, task helpers, and `exec()`
 
 ## 1.2.4 - 2026.06.25
 * Updated the programmers manual for recent ToastStunt 2.7.2, 2.7.3, and 2.8.0 behavior changes

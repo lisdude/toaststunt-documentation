@@ -1320,7 +1320,7 @@ The resulting list has the value of expression-1 as its first element, that of e
 The addition operator works with lists. When adding two lists together, the two will be concatenated:
 
 ```
-{1, 2, 3} + {4, 5, 6} => {1, 2, 3, 4, 5, 6}) 
+{1, 2, 3} + {4, 5, 6} => {1, 2, 3, 4, 5, 6}
 ```
 
 When adding another type to a list, it will append that value to the end of the list:
@@ -2537,7 +2537,7 @@ tostr(1.0/3.0)             =>   "0.333333333333333"
 tostr(#17)                 =>   "#17"
 tostr("foo")               =>   "foo"
 tostr({1, 2})              =>   "{list}"
-tostr([1 -> 2]             =>   "[map]"
+tostr([1 -> 2])            =>   "[map]"
 tostr(E_PERM)              =>   "Permission denied"
 tostr("3 + 4 = ", 3 + 4)   =>   "3 + 4 = 7"
 ```
@@ -2556,7 +2556,7 @@ toliteral(1.0/3.0)    =>   "0.333333333333333"
 toliteral(#17)        =>   "#17"
 toliteral("foo")      =>   "\"foo\""
 toliteral({1, 2})     =>   "{1, 2}"
-toliteral([1 -> 2]    =>   "[1 -> 2]"
+toliteral([1 -> 2])   =>   "[1 -> 2]"
 toliteral(E_PERM)     =>   "E_PERM"
 ```
 
@@ -2760,7 +2760,7 @@ random(1, 5000)             => integer between 1 and 5000
 
 **Function: `frandom`**
 
-float `frandom` (FLOAT mod1 [, FLOAT mod2)
+float `frandom` (FLOAT mod1 [, FLOAT mod2])
 
 If only one argument is given, a floating point number is chosen randomly from the range `[1.0..mod1]` and returned. If two arguments are given, a floating point number is randomly chosen from the range `[mod1..mod2]`.
 
@@ -3025,9 +3025,8 @@ index -- Returns the index of the first character of the first occurrence of str
 
 rindex -- Returns the index of the first character of the last occurrence of str2 in str1.
 
-int `index` (str str1, str str2, [, int case-matters [, int skip])
-
-int `rindex` (str str1, str str2, [, int case-matters [, int skip])
+int `index` (str str1, str str2 [, int case-matters [, int skip]])
+int `rindex` (str str1, str str2 [, int case-matters [, int skip]])
 
 These functions will return zero if str2 does not occur in str1 at all.
 
@@ -3078,7 +3077,7 @@ If str1 is [lexicographically](https://en.wikipedia.org/wiki/Lexicographical_ord
 
 explode -- Returns a list of substrings of subject that are separated by break. break defaults to a space.
 
-list  `explode`(STR subject [, STR break [, INT include-sequential-occurrences])
+list  `explode`(STR subject [, STR break [, INT include-sequential-occurrences]])
 
 Only the first character of `break` is considered:
 
@@ -3463,9 +3462,9 @@ string_hash -- Returns a string encoding the result of applying the SHA256 crypt
 
 binary_hash -- Returns a string encoding the result of applying the SHA256 cryptographically secure hash function to the contents of the string text or the binary string bin-string.
 
-str `string_hash` (str string, [, algo [, binary]]) 
+str `string_hash` (str string [, str algo [, any binary]])
 
-str `binary_hash` (str bin-string, [, algo [, binary])
+str `binary_hash` (str bin-string [, str algo [, any binary]])
 
  If algo is provided, it specifies the hashing algorithm to use. "MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512" and "RIPEMD160" are all supported. If binary is provided and true, the result is in MOO binary string format; by default the result is a hexadecimal string.
 
@@ -3557,7 +3556,9 @@ listinsert -- This functions return a copy of list with value added as a new ele
 
 listappend -- This functions return a copy of list with value added as a new element.
 
-list `listinsert` (list list, value [, int index]) list `listappend` (list list, value [, int index])
+list `listinsert` (list list, value [, int index])
+
+list `listappend` (list list, value [, int index])
 
 `listinsert()` and `listappend()` add value before and after (respectively) the existing element with the given index, if provided.
 
@@ -3609,14 +3610,17 @@ listset(x, "mumble", 2)   =>   {"foo", "mumble", "baz"}
 
 This function exists primarily for historical reasons; it was used heavily before the server supported indexed assignments like `x[i] = v`. New code should always use indexed assignment instead of `listset()` wherever possible.
 
-**Function: `setadd`**<br>
+**Function: `setadd`**
+
 **Function: `setremove`**
 
 setadd -- Returns a copy of list with the given value added.
 
 setremove -- Returns a copy of list with the given value removed.
 
-list `setadd` (list list, value) list `setremove` (list list, value)
+list `setadd` (list list, value)
+
+list `setremove` (list list, value)
 
 `setadd()` only adds value if it is not already an element of list; list is thus treated as a mathematical set. value is added at the end of the resulting list, if at all.  Similarly, `setremove()` returns a list identical to list if value is not an element. If value appears more than once in list, only the first occurrence is removed in the returned copy.
 
@@ -3742,9 +3746,9 @@ map `mapdelete` (MAP map, key|LIST keys)
 ```
 x = ["foo" -> 1, "bar" -> 2, "baz" -> 3];
 mapdelete(x, "bar")   ⇒   ["baz" -> 3, "foo" -> 1]
+```
 
 When passed a list as the second argument, mapdelete() will now delete multiple keys from the map in a single operation. If any key in the list is not found, a descriptive error is raised showing which key was missing.
-```
 
 **Function: `maphaskey`**
 
@@ -3998,7 +4002,7 @@ Note that the object with this number may no longer exist; it may have been recy
 
 move -- Changes what's location to be where.
 
-none `move` (obj what, obj where [, INT position)
+none `move` (obj what, obj where [, INT position])
 
 This is a complex process because a number of permissions checks and notifications must be performed.  The actual movement takes place as described in the following paragraphs.
 
@@ -4084,7 +4088,9 @@ If object is not valid, then `E_INVARG` is raised. If the programmer does not ha
 
 is_clear_property -- Test the specified property for clear
 
-int `is_clear_property` (obj object, str prop-name) **Function: `clear_property`**
+int `is_clear_property` (obj object, str prop-name)
+
+**Function: `clear_property`**
 
 clear_property -- Set the specified property to clear
 
@@ -4852,7 +4858,9 @@ If include-all is provided and true, then the list includes the object numbers a
 
 connected_seconds -- return the number of seconds that the currently-active connection to player has existed
 
-int `connected_seconds` (obj player) **Function: `idle_seconds`**
+int `connected_seconds` (obj player)
+
+**Function: `idle_seconds`**
 
 idle_seconds -- return the number of seconds that the currently-active connection to player has been idle
 
@@ -4864,7 +4872,7 @@ If player is not the object number of a player object with a currently-active co
 
 notify -- enqueues string for output (on a line by itself) on the connection conn
 
-none `notify` (obj conn, str string [, INT no-flush [, INT suppress-newline])
+int `notify` (obj conn, str string [, INT no-flush [, INT suppress-newline]])
 
 If the programmer is not conn or a wizard, then `E_PERM` is raised. If conn is not a currently-active connection, then this function does nothing. Output is normally written to connections only between tasks, not during execution.
 
@@ -5100,7 +5108,9 @@ set_connection_option(player, "keep-alive", 1);
 ```
 
 Or:
-```set_connection_option(player, "keep-alive", ["idle" -> 90, "interval" -> 60]);
+
+```
+set_connection_option(player, "keep-alive", ["idle" -> 90, "interval" -> 60]);
 ```
 
 Note: If you don't provide one of the 3 options in the map it will default to whatever is in options.h.
@@ -5249,7 +5259,7 @@ listen() raises E_PERM if the programmer is not a wizard, E_INVARG if `object` i
 Example:
 
 ```
-listen(#0, 1234, ["ipv6" -> 1, "tls" -> 1, "certificate" -> "/etc/certs/something.pem", "key" -> "/etc/certs/privkey.pem", "print-messages" -> 1]
+listen(#0, 1234, ["ipv6" -> 1, "tls" -> 1, "certificate" -> "/etc/certs/something.pem", "key" -> "/etc/certs/privkey.pem", "print-messages" -> 1])
 ```
 
 Listen for IPv6 connections on port 1234 and print messages as appropriate. These connections must be TLS and will use the private key and certificate found in /etc/certs.
@@ -5258,9 +5268,9 @@ Listen for IPv6 connections on port 1234 and print messages as appropriate. Thes
 
 unlisten -- stop listening for connections on the point described by canon, which should match the `port` value from an element of the list returned by `listeners()`
 
-none `unlisten` (canon)
+none `unlisten` (canon [, INT ipv6])
 
-Raises `E_PERM` if the programmer is not a wizard and `E_INVARG` if there does not exist a listener with that description.
+Raises `E_PERM` if the programmer is not a wizard and `E_INVARG` if there does not exist a listener with that description. If `ipv6` is provided and true, ToastStunt looks for an IPv6 listener with that description.
 
 **Function: `listeners`**
 
@@ -5356,7 +5366,7 @@ If name is provided, only the description of the function with that name is retu
 Each function description is a list of the following form:
 
 ```
-{name, min-args, max-args, types
+{name, min-args, max-args, types}
 ```
 
 where name is the name of the built-in function, min-args is the minimum number of arguments that must be provided to the function, max-args is the maximum number of arguments that can be provided to the function or `-1` if there is no maximum, and types is a list of max-args integers (or min-args if max-args is `-1`), each of which represents the type of argument required in the corresponding position. Each type number is as would be returned from the `typeof()` built-in function except that `-1` indicates that any type of value is acceptable and `-2` indicates that either integers or floating-point numbers may be given. For example, here are several entries from the list:
@@ -5405,7 +5415,7 @@ eval("return 3 + 4;")   =>   {1, 7}
 
 set_task_perms -- changes the permissions with which the currently-executing verb is running to be those of who
 
-one `set_task_perms` (obj who)
+none `set_task_perms` (obj who)
 
 If the programmer is neither who nor a wizard, then `E_PERM` is raised.
 > Note: This does not change the owner of the currently-running verb, only the permissions of this particular invocation. It is used in verbs owned by wizards to make themselves run with lesser (usually non-wizard) permissions.
@@ -5493,7 +5503,9 @@ thread_pool("INIT", "MAIN", 1)     => Replace the existing main thread pool with
 
 ticks_left -- return the number of ticks left to the current task before it will be forcibly terminated
 
-int `ticks_left` () **Function: `seconds_left`**
+int `ticks_left` ()
+
+**Function: `seconds_left`**
 
 seconds_left -- return the number of seconds left to the current task before it will be forcibly terminated
 
@@ -5593,7 +5605,7 @@ If the caller is a wizard a map of debug information about task queues will be r
 
 queued_tasks -- returns information on each of the background tasks (i.e., forked, suspended or reading) owned by the programmer (or, if the programmer is a wizard, all queued tasks)
 
-list `queued_tasks` ([INT show-runtime [, INT count-only])
+list `queued_tasks` ([INT show-runtime [, INT count-only]])
 
 The returned value is a list of lists, each of which encodes certain information about a particular queued task in the following format:
 
@@ -5671,7 +5683,7 @@ The first element of the list returned by `callers()` gives information on the v
 
 task_stack -- returns information like that returned by the `callers()` function, but for the suspended task with the given task-id; the include-line-numbers argument has the same meaning as in `callers()`
 
-list `task_stack` (int task-id [, INT include-line-numbers [, INT include-variables])
+list `task_stack` (int task-id [, INT include-line-numbers [, INT include-variables]])
 
 Raises `E_INVARG` if task-id does not specify an existing suspended task and `E_PERM` if the programmer is neither a wizard nor the owner of the specified task.
 
@@ -5689,7 +5701,8 @@ str `server_version` ([int with-details])
 
 If with-details is provided and true, returns a detailed list including version number as well as compilation options.
 
-**Function `load_server_options`**
+**Function: `load_server_options`**
+
 load_server_options -- This causes the server to consult the current values of properties on $server_options, updating the corresponding serveroption settings
 
 none `load_server_options` ()
@@ -5794,7 +5807,7 @@ Raises `E_QUOTA` if, for some reason, no such on-disk representation is currentl
 
 exec -- Asynchronously executes the specified external executable, optionally sending input. 
 
-list `exec` (LIST command[, STR input][, LIST environment variables])
+list `exec` (LIST command [, STR input] [, LIST environment variables])
 
 Returns the process return code, output and error. If the programmer is not a wizard, then E_PERM is raised.
 
@@ -5821,9 +5834,9 @@ The strings, input, output and error are all MOO binary strings.
 All external executables must reside in the executables directory.
 
 ```
-exec({"cat", "-?"})                                      {1, "", "cat: illegal option -- ?~0Ausage: cat [-benstuv] [file ...]~0A"}
-exec({"cat"}, "foo")                                     {0, "foo", ""}
-exec({"echo", "one", "two"})                             {0, "one two~0A", ""}
+exec({"cat", "-?"})          =>   {1, "", "cat: illegal option -- ?~0Ausage: cat [-benstuv] [file ...]~0A"}
+exec({"cat"}, "foo")         =>   {0, "foo", ""}
+exec({"echo", "one", "two"}) =>   {0, "one two~0A", ""}
 ```
 
 **Function: `shutdown`**
