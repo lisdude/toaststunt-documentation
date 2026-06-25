@@ -6,6 +6,10 @@
 * Updated function help for recent ToastStunt 2.7.2, 2.7.3, and 2.8.0 behavior changes
 * Added help entries for listeners(), add_property(), and add_verb()
 * Removed stale panic() help and updated JSON, PCRE2, networking, proxy, and anonymous object help text
+* Added manual and function help coverage for missing source-audited builtins including `round()`, `cbrt()`, `atan2()`, `asinh()`, `acosh()`, `atanh()`, `distance()`, `relative_heading()`, `simplex_noise()`, `parse_ansi()`, `remove_ansi()`, `url_encode()`, `url_decode()`, `task_perms()`, `pcre_cache_stats()`, `malloc_stats()`, `run_gc()`, `gc_stats()`, `anon()`, and `file_flush()`
+* Removed stale active documentation for unavailable `file_version()`, `clear_ancestor_cache()`, and `thread_info()` builtins
+* Corrected source-audited builtin contracts for `maphaskey()`, `locate_by_name()`, `add_verb()`, SQLite helpers, `connection_info()`, `switch_player()`, `task_local()`, and `set_task_local()`
+* Fixed invalid `set_connection_options()` examples to use `set_connection_option()`
 
 ## 1.2.4 - 2026.06.25
 * Updated the programmers manual for recent ToastStunt 2.7.2, 2.7.3, and 2.8.0 behavior changes

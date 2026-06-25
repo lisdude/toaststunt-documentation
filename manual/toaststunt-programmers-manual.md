@@ -3750,7 +3750,9 @@ When passed a list as the second argument, mapdelete() will now delete multiple 
 
 maphaskey -- Returns 1 if key exists in map. When not dealing with hundreds of keys, this function is faster (and easier to read) than something like: !(x in mapkeys(map))
 
-int `maphaskey` (MAP map, STR key)
+int `maphaskey` (MAP map, ANY key [, INT case-matters])
+
+If `case-matters` is true, string-key comparison is case-sensitive. Collection values cannot be used as keys for this lookup; if key is a list, map, or other collection value, then `E_TYPE` is raised.
 
 #### Manipulating Objects
 
@@ -3881,7 +3883,9 @@ isa(#2, {$thing, $room, $container}, 1) => #-1
 
 locate_by_name -- This function searches every object in the database for those containing `object name` in their .name property.
 
-list `locate_by_name` (STR object name)
+list `locate_by_name` (STR object name [, INT case-matters])
+
+If `case-matters` is true, string matching is case-sensitive. The programmer must be a wizard, or `E_PERM` is raised.
 
 As of ToastStunt 2.8.0, this is not a threaded function.
 
@@ -4173,9 +4177,9 @@ set_verb_args($container, "take", {"any", "from", "this"})
 
 add_verb -- defines a new verb on the given object
 
-none `add_verb` (obj object, list info, list args)
+int `add_verb` (obj object, list info, list args)
 
-The new verb's owner, permission bits and name(s) are given by info in the same format as is returned by `verb_info()`, described above. The new verb's direct-object, preposition, and indirect-object specifications are given by args in the same format as is returned by `verb_args`, described above. The new verb initially has the empty program associated with it; this program does nothing but return an unspecified value. The object argument must be a permanent object; anonymous objects cannot have new verbs added directly to them.
+The new verb's owner, permission bits and name(s) are given by info in the same format as is returned by `verb_info()`, described above. The new verb's direct-object, preposition, and indirect-object specifications are given by args in the same format as is returned by `verb_args`, described above. The new verb initially has the empty program associated with it; this program does nothing but return an unspecified value. The object argument must be a permanent object; anonymous objects cannot have new verbs added directly to them. On success, the returned integer is the one-based number of the new verb on object.
 
 If object is not a permanent object, then `E_TYPE` is raised. If object is not valid, or info does not specify a valid owner and well-formed permission bits and verb names, or args is not a legitimate syntax specification, then `E_INVARG` is raised. If the programmer does not have write permission on object or if the owner specified by info is not the programmer and the programmer is not a wizard, then `E_PERM` is raised.
 
@@ -4624,6 +4628,8 @@ This is implemented using chmod().
 
 SQLite allows you to store information in locally hosted SQLite databases.
 
+All SQLite built-in functions require wizard permissions. If the programmer is not a wizard, then `E_PERM` is raised.
+
 **Function: `sqlite_open`**
 
 sqlite_open -- The function `sqlite_open` will attempt to open the database at path for use with SQLite.
@@ -4644,19 +4650,15 @@ SQLITE_SANITIZE_STRINGS [8]: If set, newlines (\n) are converted into tabs (\t) 
 
 If successful, the function will return the numeric handle for the open database.
 
-If unsuccessful, the function will return a helpful error message.
-
-If the database is already open, a traceback will be thrown that contains the already open database handle.
+If too many database handles are already open, then `E_QUOTA` is raised. If path is invalid, then `E_INVARG` is raised. If the database is already open, `E_INVARG` is raised with the existing database handle as the error value. If SQLite cannot open the database, then `E_NONE` is raised with the SQLite error message.
 
 **Function: `sqlite_close`**
 
 sqlite_close -- This function will close an open database.
 
-int `sqlite_close`(INT database handle)
+none `sqlite_close`(INT database handle)
 
-If successful, return 1;
-
-If unsuccessful, returns E_INVARG.
+If database handle is invalid, then `E_INVARG` is raised. If the handle still has worker threads using it, then `E_PERM` is raised.
 
 **Function: `sqlite_execute`**
 
@@ -4704,11 +4706,13 @@ If show columns is true, the return list will include the name of the column bef
 
 sqlite_limit -- This function allows you to specify various construct limitations on a per-database basis.
 
-int `sqlite_limit`(INT database handle, STR category INT new value)
+int `sqlite_limit`(INT database handle, STR|INT category, INT new value)
 
 If new value is a negative number, the limit is unchanged. Each limit category has a hardcoded upper bound. Attempts to increase a limit above its hard upper bound are silently truncated to the hard upper bound.
 
 Regardless of whether or not the limit was changed, the sqlite_limit() function returns the prior value of the limit. Hence, to find the current value of a limit without changing it, simply invoke this interface with the third parameter set to -1.
+
+Category may be either one of the string limit names below or the corresponding integer SQLite limit category. If database handle is invalid or category is not recognized, then `E_INVARG` is raised.
 
 As of this writing, the following limits exist:
 
@@ -4753,12 +4757,17 @@ sqlite_info -- This function returns a map of information about the database at 
 
 map `sqlite_info`(INT database handle)
 
-The information returned is:
+The returned map contains these keys:
 
-* Database Path
-* Type parsing enabled?
-* Object parsing enabled?
-* String sanitation enabled?
+| Key | Value |
+| --- | --- |
+| path | Database path |
+| parse_types | True if result values are parsed into MOO values |
+| parse_objects | True if strings such as "#123" are parsed as object references |
+| sanitize_strings | True if newlines in strings are converted to tabs |
+| locks | Number of active worker-thread operations using the handle |
+
+If database handle is invalid, then `E_INVARG` is raised.
 
 **Function: `sqlite_handles`**
 
@@ -4943,7 +4952,7 @@ It is not an error if this verb does not exist; the call is simply skipped.
 
 connection_info -- Returns a MAP of network connection information for `connection`. At the time of writing, the following information is returned:
 
-list `connection_info` (OBJ `connection`)
+map `connection_info` (OBJ `connection`)
 
 | Key                 | Value                                                                                                                                                                                          |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -4954,7 +4963,10 @@ list `connection_info` (OBJ `connection`)
 | source_ip           | The unresolved numeric IP address of the interface a connection was made on. For outbound connections, this value is meaningless.                                                              |
 | source_port         | The local port a connection connected to. For outbound connections, this value is meaningless.                                                                                                 |
 | protocol            | Describes the protocol used to make the connection. At the time of writing, this could be IPv4 or IPv6.                                                                                        |
-| outbound | Indicates whether a connection is outbound or not |
+| outbound            | Indicates whether a connection is outbound or not                                                                                                                                                         |
+| tls                 | TLS connection information, when ToastStunt was built with TLS support                                                                                                                                    |
+
+If connection is not valid or is disconnecting, then `E_INVARG` is raised. If the programmer is not a wizard and is not connection, then `E_PERM` is raised.
 
 **Function: `connection_name`**
 
@@ -5014,11 +5026,13 @@ This function is primarily intended for use when the 'NO_NAME_LOOKUP' server opt
 
 switch_player -- Silently switches the player associated with this connection from object1 to object2.
 
-`switch_player`(OBJ object1, OBJ object2 [, INT silent])
+none `switch_player`(OBJ object1, OBJ object2 [, INT silent])
 
-object1 must be connected and object2 must be a player. This can be used in do_login_command() verbs that read or suspend (which prevents the normal player selection mechanism from working.
+object1 must be connected and object2 must be a player. This can be used in do_login_command() verbs that read or suspend (which prevents the normal player selection mechanism from working).
 
 If silent is true, no connection messages will be printed.
+
+The programmer must be a wizard, or `E_PERM` is raised. `E_INVARG` is raised if object1 and object2 are the same object, if object1 is not connected, if object2 is not a player, or if object1 has no task queue to transfer.
 
 > Note: This calls the listening object's user_disconnected and user_connected verbs when appropriate.
 
@@ -5414,9 +5428,11 @@ obj `task_perms` ()
 
 set_task_local -- Sets a value that gets associated with the current running task. 
 
-void set_task_local(ANY value)
+void `set_task_local`(ANY value)
 
 This value persists across verb calls and gets reset when the task is killed, making it suitable for securely passing sensitive intermediate data between verbs. The value can then later be retrieved using the `task_local` function.
+
+The programmer must be a wizard, or `E_PERM` is raised.
 
 ```
 set_task_local("arbitrary data")
@@ -5428,6 +5444,8 @@ set_task_local({"list", "of", "arbitrary", "data"})
 task_local -- Returns the value associated with the current task. The value is set with the `set_task_local` function.
 
 mixed `task_local` ()
+
+The programmer must be a wizard, or `E_PERM` is raised.
 
 **Function: `threads`**
 
