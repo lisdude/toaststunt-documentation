@@ -5493,11 +5493,13 @@ list `threads`()
 
 **Function: `set_thread_mode`**
 
-int `set_thread_mode`([INT mode])
+int `set_thread_mode`()
+
+none `set_thread_mode`(INT mode)
 
 With no arguments specified, set_thread_mode will return the current thread mode for the verb. A value of 1 indicates that threading is enabled for functions that support it. A value of 0 indicates that threading is disabled and all functions will execute in the main MOO thread, as functions have done in default LambdaMOO since version 1.
 
-If you specify an argument, you can control the thread mode of the current verb. A mode of 1 will enable threading and a mode of 0 will disable it. You can invoke this function multiple times if you want to disable threading for a single function call and enable it for the rest.
+If you specify an argument, you can control the thread mode of the current verb. A mode of 1 will enable threading and a mode of 0 will disable it. This form returns no value. You can invoke this function multiple times if you want to disable threading for a single function call and enable it for the rest.
 
 When should you disable threading? In general, threading should be disabled in verbs where it would be undesirable to suspend(). Each threaded function will immediately suspend the verb while the thread carries out its work. This can have a negative effect when you want to use these functions in verbs that cannot or should not suspend, like $sysobj:do_command or $sysobj:do_login_command.
 
@@ -5724,11 +5726,15 @@ If include-variables is passed and true, variables will be included with each fr
 
 **Function: `server_version`**
 
-server_version -- returns a string giving the version number of the running MOO server
+server_version -- returns version information for the running MOO server
 
-str `server_version` ([int with-details])
+str `server_version` ()
 
-If with-details is provided and true, returns a detailed list including version number as well as compilation options.
+list `server_version` (value details)
+
+value `server_version` (str detail-path)
+
+With no arguments, this returns the plain server version string. With a non-string argument or an empty string, this returns the full detailed version list, including version number, compile-time settings, and source information; for example, `server_version(1)` returns the full detailed list. With a non-empty string argument, this returns the matching slash-separated detail-path entry from that version list. If the requested detail path does not exist, `E_INVARG` is raised.
 
 **Function: `load_server_options`**
 
