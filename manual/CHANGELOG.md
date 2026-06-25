@@ -1,3 +1,10 @@
+## 1.2.4 - 2026.06.25
+* Updated the programmers manual for recent ToastStunt 2.7.2, 2.7.3, and 2.8.0 behavior changes
+* Removed stale `panic()` documentation and documented `shutdown()` unclean shutdown behavior
+* Updated `parse_json()` null handling, PCRE2 wording, and `pcre_match()` empty-subject behavior
+* Updated `occupants()`, `locate_by_name()`, `listeners()`, `curl()`, and `open_network_connection()` documentation to match current behavior
+* Updated proxy and anonymous object documentation, including `trusted_proxies` and anonymous object verb/property restrictions
+
 ## 1.2.3 - 2026.04.13
 * Added sqlite_open parse types note to prevent confusion
 
