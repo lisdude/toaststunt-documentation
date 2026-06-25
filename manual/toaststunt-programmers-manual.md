@@ -2226,9 +2226,17 @@ Anonymous objects technically have a player flag and children lists, but you can
 
 As of ToastStunt 2.8.0, anonymous objects that inherit from a parent are no longer invalidated merely because that parent's properties change.
 
-> Warning: Similar to WAIFs, you want to take care in how you are creating Anonymous Objects, as once they are created, if you continue to reference them in a property, you may have trouble finding them in the future, as there is no way to pull up a list of all Anonymous Objects. 
+> Warning: Similar to WAIFs, you want to take care in how you are creating Anonymous Objects, as once they are created, if you continue to reference them in a property, you may have trouble finding them in the future, as there is no way to pull up a list of all Anonymous Objects.
 
 > Note: The section for [Additional Details on WAIFs](#additional-details-on-waifs) has example verbs that can be used to detect Anonymous Objects referenced in your system.
+
+**Function: `anon`**
+
+anon -- Returns anonymous-object debugging information.
+
+list `anon`([LIST command [, value]])
+
+This function is registered only in non-`NDEBUG` builds and is intended for development/debugging. The programmer must be a wizard, or `E_PERM` is raised. With no arguments, it returns the available anonymous-object debug commands. Production code should create anonymous objects with `create(parent, owner, 1)` or `create(parents, owner, 1)`.
 
 ### Working with WAIFs
 
@@ -2826,7 +2834,7 @@ cos -- Returns the cosine of x.
 
 float `cos` (float x)
 
-**Function: `tangent`**
+**Function: `tan`**
 
 tan -- Returns the tangent of x.
 
@@ -2856,6 +2864,12 @@ float `atan` (float y [, float x])
 
 if x is not provided, or of `y/x` in the range `[-pi..pi]` if x is provided.
 
+**Function: `atan2`**
+
+atan2 -- Returns the arc-tangent of y/x in the range `[-pi..pi]`.
+
+float `atan2` (float y, float x)
+
 **Function: `sinh`**
 
 sinh -- Returns the hyperbolic sine of x.
@@ -2873,6 +2887,28 @@ float `cosh` (float x)
 tanh -- Returns the hyperbolic tangent of x.
 
 float `tanh` (float x)
+
+**Function: `asinh`**
+
+asinh -- Returns the inverse hyperbolic sine of x.
+
+float `asinh` (float x)
+
+**Function: `acosh`**
+
+acosh -- Returns the inverse hyperbolic cosine of x.
+
+float `acosh` (float x)
+
+Raises `E_INVARG` if x is less than 1.0.
+
+**Function: `atanh`**
+
+atanh -- Returns the inverse hyperbolic tangent of x.
+
+float `atanh` (float x)
+
+Raises `E_INVARG` if x is outside the range `[-1.0..1.0]`.
 
 **Function: `exp`**
 
@@ -2908,6 +2944,12 @@ floor -- Returns the largest integer not greater than x, as a floating-point num
 
 float `floor` (float x)
 
+**Function: `round`**
+
+round -- Returns x rounded to the nearest integer value, as a floating-point number.
+
+float `round` (float x)
+
 **Function: `trunc`**
 
 trunc -- Returns the integer obtained by truncating x at the decimal point, as a floating-point number.
@@ -2915,6 +2957,36 @@ trunc -- Returns the integer obtained by truncating x at the decimal point, as a
 float `trunc` (float x)
 
 For negative x, this is equivalent to `ceil()`; otherwise it is equivalent to `floor()`.
+
+**Function: `cbrt`**
+
+cbrt -- Returns the cube root of x.
+
+float `cbrt` (float x)
+
+**Function: `distance`**
+
+distance -- Returns the Euclidean distance between two coordinate lists.
+
+float `distance` (LIST from, LIST to)
+
+The calculation pairs entries by index, so callers should pass coordinate lists of the same length. Each element used in the calculation must be an integer or floating-point number. If either list contains a non-numeric element, then `E_TYPE` is raised.
+
+**Function: `relative_heading`**
+
+relative_heading -- Returns the horizontal and vertical heading from one three-dimensional point to another.
+
+list `relative_heading` (LIST from, LIST to)
+
+Both lists must contain three floating-point numbers. The returned list has two integers: horizontal heading in degrees and vertical heading in degrees. If either list contains non-float elements, then `E_TYPE` is raised.
+
+**Function: `simplex_noise`**
+
+simplex_noise -- Returns simplex noise for one to four dimensions.
+
+float `simplex_noise` (LIST coordinates)
+
+The coordinate list must contain one, two, three, or four floating-point numbers. If any coordinate is not a float, then `E_TYPE` is raised. Unsupported dimensionality returns `E_TYPE`.
 
 ##### Operations on Strings
 
@@ -3024,6 +3096,22 @@ explode("%slither%is%%wiz%", "%", 1) => {"", "slither", "is", "", "wiz", ""}
 ```
 
 > Note: This can be used as a replacement for `$string_utils:explode`.
+
+**Function: `parse_ansi`**
+
+parse_ansi -- Replaces ToastStunt ANSI tags in string with ANSI escape sequences.
+
+str `parse_ansi` (STR string)
+
+Recognized tags include foreground colors such as `[red]`, `[green]`, `[yellow]`, `[blue]`, `[purple]`, `[cyan]`, `[white]`, `[gray]`, `[grey]`, and `[black]`; background colors such as `[b:red]`; style tags such as `[bold]`, `[underline]`, `[inverse]`, `[blink]`, `[normal]`, `[unbold]`, `[unblink]`, and `[unbright]`; and utility tags such as `[beep]`, `[random]`, and `[null]`.
+
+**Function: `remove_ansi`**
+
+remove_ansi -- Removes ToastStunt ANSI tags from string.
+
+str `remove_ansi` (STR string)
+
+This removes the same bracketed tags recognized by `parse_ansi()` without replacing them with ANSI escape sequences.
 
 **Function: `decode_binary`**
 
@@ -3222,6 +3310,14 @@ pcre_replace("Unix, wow! /bin/bash is a thing.", "s!/bin/bash!/bin/fish!g")
 
 => "Unix, wow! /bin/fish is a thing."
 ```
+
+**Function: `pcre_cache_stats`**
+
+pcre_cache_stats -- Returns statistics for the PCRE pattern cache.
+
+list `pcre_cache_stats` ()
+
+The programmer must be a wizard, or `E_PERM` is raised. The returned list contains entries of the form `{pattern, cache-hits}`.
 
 ##### Legacy MOO Regular Expressions
 
@@ -3861,14 +3957,6 @@ ancestors -- Return a list of all ancestors of `object` in order ascending up th
 
 list `ancestors`(OBJ object [, INT full])
 
-**Function: `clear_ancestor_cache`**
-
-WARNING: This is deprecated and is removed in 2.7.3
-
-void `clear_ancestor_cache`()
-
-The ancestor cache contains a quick lookup of all of an object's ancestors which aids in expediant property lookups. This is an experimental feature and, as such, you may find that something has gone wrong. If that's that case, this function will completely clear the cache and it will be rebuilt as-needed.
-
 **Function: `descendants`**
 
 list `descendants`(OBJ object [, INT full])
@@ -4207,16 +4295,6 @@ This is raised for a number of reasons.  The common reasons are an invalid FHAND
 
 This is raised when any of these functions are called with non- wizardly permissions.
 
-**General Functions**
-
-**Function: `file_version`**
-
-file_version -- Returns the package shortname/version number of this package e.g.
-
-str `file_version`()
-
-`file_version() => "FIO/1.7"`
-
 **Opening and closing of files and related functions**
 
 File streams are associated with FHANDLES.  FHANDLES are similar to the FILE\* using stdio.  You get an FHANDLE from file_open.  You should not depend on the actual type of FHANDLEs (currently TYPE_INT).  FHANDLEs are not persistent across server restarts.  That is, files open when the server is shut down are closed when it comes back up and no information about open files is saved in the DB.
@@ -4327,6 +4405,14 @@ int `file_write`(FHANDLE fh, STR data)
 Not recommended for use on files in text mode.
 
 This is implemented using fwrite().
+
+** Function: `file_flush`**
+
+file_flush -- Flushes buffered writes for the file.
+
+void `file_flush`(FHANDLE fh)
+
+This is implemented using fflush().
 
 ** Function: `file_count_lines`**
 
@@ -4984,9 +5070,9 @@ Note that connection_options() with no second argument will return a list while 
 
 ```
 save = connection_options(player,"intrinsic-commands");
-set_connection_options(player, "intrinsic-commands, 1);
+set_connection_option(player, "intrinsic-commands", 1);
 full_list = connection_options(player,"intrinsic-commands");
-set_connection_options(player,"intrinsic-commands", save);
+set_connection_option(player,"intrinsic-commands", save);
 return full_list;
 ```
 
@@ -5062,6 +5148,22 @@ It's worth noting that the data you get back will be binary encoded. In particul
 CURL_TIMEOUT is defined in options.h to specify the maximum amount of time a CURL request can take before failing. For special circumstances, you can specify a longer or shorter timeout using the third argument of curl().
 
 As of ToastStunt 2.7.3 curl supports the Dictionary Server (DICT) protocol.
+
+**Function: `url_encode`**
+
+url_encode -- URL-encodes a string.
+
+str `url_encode` (STR string)
+
+Returns string with characters escaped for use in a URL. If outbound networking is disabled at runtime, then `E_PERM` is raised. If ToastStunt was built without curl support, this function is not available.
+
+**Function: `url_decode`**
+
+url_decode -- URL-decodes a string.
+
+str `url_decode` (STR string)
+
+Returns a decoded copy of string. If outbound networking is disabled at runtime, then `E_PERM` is raised. If ToastStunt was built without curl support, this function is not available.
 
 **Function: `read_http`**
 
@@ -5302,6 +5404,12 @@ obj `caller_perms` ()
 
 If the currently-executing verb was not called by another verb (i.e., it is the first verb called in a command or server task), then `caller_perms()` returns `#-1`.
 
+**Function: `task_perms`**
+
+task_perms -- returns the permissions in use by the currently-executing task
+
+obj `task_perms` ()
+
 **Function: `set_task_local`**
 
 set_task_local -- Sets a value that gets associated with the current running task. 
@@ -5323,7 +5431,7 @@ mixed `task_local` ()
 
 **Function: `threads`**
 
-threads -- When one or more MOO processes are suspended and working in a separate thread, this function will return a LIST of handlers to those threads. These handlers can then be passed to `thread_info' for more information.
+threads -- When one or more MOO processes are suspended and working in a separate thread, this function returns a list of handlers to those threads.
 
 list `threads`()
 
@@ -5338,18 +5446,6 @@ If you specify an argument, you can control the thread mode of the current verb.
 When should you disable threading? In general, threading should be disabled in verbs where it would be undesirable to suspend(). Each threaded function will immediately suspend the verb while the thread carries out its work. This can have a negative effect when you want to use these functions in verbs that cannot or should not suspend, like $sysobj:do_command or $sysobj:do_login_command.
 
 Note that the threading mode affects the current verb only and does NOT affect verbs called from within that verb.
-
-**Function: `thread_info`**
-
-thread_info -- If a MOO task is running in another thread, its thread handler will give you information about that thread. 
-
-list `thread_info`(INT thread handler)
-
-The information returned in a LIST will be:
-
-English Name: This is the name the programmer of the builtin function has given to the task being executed.
-
-Active: 1 or 0 depending upon whether or not the MOO task has been killed. Not all threads cleanup immediately after the MOO task dies.
 
 **Function: `thread_pool`**
 
@@ -5624,6 +5720,14 @@ The result is a list in the following format:
 
 {total memory used, resident set size, shared pages, text, data + stack}
 
+**Function: `malloc_stats`**
+
+malloc_stats -- Returns allocator statistics when ToastStunt was built with jemalloc support.
+
+list `malloc_stats` ()
+
+This function is available only when ToastStunt is built with jemalloc. The returned list has the form `{allocated, active, resident, metadata, mapped, allocated-large, active-large}`.
+
 **Function: `usage`**
 
 usage -- Return statistics concerning the server the MOO is running on.
@@ -5635,6 +5739,22 @@ The result is a list in the following format:
 ```
 {{load averages}, user time, system time, page reclaims, page faults, block input ops, block output ops, voluntary context switches, involuntary context switches, signals received}
 ```
+
+**Function: `run_gc`**
+
+run_gc -- Requests a garbage-collection pass.
+
+none `run_gc` ()
+
+This function is available only when ToastStunt is built with garbage collection enabled. If the programmer is not a wizard, then `E_PERM` is raised.
+
+**Function: `gc_stats`**
+
+gc_stats -- Returns garbage-collector color counts.
+
+map `gc_stats` ()
+
+This function is available only when ToastStunt is built with garbage collection enabled. If the programmer is not a wizard, then `E_PERM` is raised. The returned map contains the keys "green", "yellow", "black", "gray", "white", "purple", and "pink".
 
 **Function: `dump_database`**
 
