@@ -3819,6 +3819,8 @@ owned_objects -- Returns a list of all objects in the database owned by `owner`.
 
 list `owned_objects`(OBJ owner)
 
+Raises `E_INVIND` if owner is not a valid object.
+
 **Function: `chparent`**
 
 **Function: `chparents`**
@@ -3905,6 +3907,8 @@ list `locations`(OBJ object [, OBJ stop [, INT is-parent]])
 
 Recursively build a list of an object's location, its location's location, and so forth until finally hitting $nothing.
 
+Raises `E_INVIND` if object is not valid.
+
 Example:
 
 ```
@@ -3925,13 +3929,15 @@ Iterates through the list of objects and returns those matching a specific set o
 
 1. If only objects is specified, the occupants function will return a list of objects with the player flag set.
 
-2. If the parent argument is specified, a list of objects descending from parent> will be returned. If parent is a list, object must descend from at least one object in the list.
+2. If the parent argument is specified, a list of objects descending from parent will be returned. If parent is a list, object must descend from at least one object in the list.
 
 3. If both parent and player flag set are specified, occupants will check both that an object is descended from parent and also has the player flag set.
 
 4. If the inverse-match is 0 (default behavior). If it is 1, then inverse the match to 'items in the list that do NOT match the parent(s)'
 
 As of ToastStunt 2.8.0, this is not a threaded function.
+
+Raises `E_TYPE` if parent is provided and is not an object or list of objects. Raises `E_INVARG` if objects is not a valid list of objects.
 
 **Function: `recycle`**
 
@@ -3957,7 +3963,9 @@ The normal rules apply to parent and owner. You either have to own parent, paren
 
 next_recycled_object -- Return the lowest invalid object. If start is specified, no object lower than start will be considered. If there are no invalid objects, this function will return 0.
 
-obj | int `next_recycled_object`(OBJ start)
+obj | int `next_recycled_object`([OBJ start])
+
+Raises `E_INVARG` if start is negative or greater than the last object number ever used.
 
 **Function: `recycled_objects`**
 
@@ -3985,7 +3993,7 @@ int `object_bytes` (obj object)
 
 The space calculation includes the space used by the values of all of the objects non-clear properties and by the verbs and properties defined directly on the object.
 
-Raises `E_INVARG` if object is not a valid object and `E_PERM` if the programmer is not a wizard.
+Raises `E_TYPE` if object is not an object, `E_INVIND` if object is not valid, and `E_PERM` if the programmer is not a wizard.
 
 **Function: `respond_to`**
 
