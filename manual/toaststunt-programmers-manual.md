@@ -4295,7 +4295,7 @@ Errors are always handled by raising some kind of exception. The following excep
 
 `E_FILE`
 
-This is raised when a stdio call returned an error value. CODE is set to E_FILE, MSG is set to the return of strerror() (which may vary from system to system), and VALUE depends on which function raised the error.  When a function fails because the stdio function returned EOF, VALUE is set to "EOF".
+This is raised when a stdio call returned an error value. CODE is set to E_FILE, MSG is set to the return of strerror() (which may vary from system to system), and VALUE depends on which function raised the error.  When a function fails because the stdio function returned EOF, MSG and VALUE are set to "End of file".
 
 `E_INVARG`
 
@@ -4336,7 +4336,7 @@ The final character is either 'n' or 'f'.  If this character is 'f', whenever da
 
 This is implemented using fopen().
 
-** Function: `file_close`**
+**Function: `file_close`**
 
 file_close -- Close a file 
 
@@ -4346,19 +4346,21 @@ Closes the file associated with fh.
 
 This is implemented using fclose().
 
-** Function: `file_name`**
+**Function: `file_name`**
 
 file_name -- Returns the pathname originally associated with fh by file_open().  This is not necessarily the file's current name if it was renamed or unlinked after the fh was opened.
 
 STR `file_name`(FHANDLE fh)
 
-** Function: `file_openmode`**
+**Function: `file_openmode`**
 
-file_open_mode -- Returns the mode the file associated with fh was opened in.
+file_openmode -- Returns the normalized mode for the file associated with fh.
 
 str `file_openmode`(FHANDLE fh)
 
-** Function: `file_handles`**
+This reflects the file handle's current read/write, text/binary, and flush flags. It is not guaranteed to round-trip the exact mode string originally passed to `file_open()`, since append modes are stored as write modes.
+
+**Function: `file_handles`**
 
 file_handles -- Return a list of open files
 
@@ -4366,7 +4368,7 @@ LIST `file_handles` ()
 
 **Input and Output Operations**
 
-** Function: `file_readline`**
+**Function: `file_readline`**
 
 file_readline -- Reads the next line in the file and returns it (without the newline).  
 
@@ -4376,9 +4378,9 @@ Not recommended for use on files in binary mode.
 
 This is implemented using fgetc().
 
-** Function: `file_readlines`**
+**Function: `file_readlines`**
 
-file_readlines -- Rewinds the file and then reads the specified lines from the file, returning them as a list of strings.  After this operation, the stream is positioned right after the last line read.
+file_readlines -- Rewinds the file and then reads the specified lines from the file, returning them as a list of strings.  After this operation, the stream is positioned at the start of the first returned line.
 
 list `file_readlines`(FHANDLE fh, INT start, INT end)
 
@@ -4386,7 +4388,7 @@ Not recommended for use on files in binary mode.
 
 This is implemented using fgetc().
 
-** Function: `file_writeline`**
+**Function: `file_writeline`**
 
 file_writeline -- Writes the specified line to the file (adding a newline).
 
@@ -4396,7 +4398,7 @@ Not recommended for use on files in binary mode.
 
 This is implemented using fputs()
 
-** Function: `file_read`**
+**Function: `file_read`**
 
 file_read -- Reads up to the specified number of bytes from the file and returns them.
 
@@ -4406,7 +4408,7 @@ Not recommended for use on files in text mode.
 
 This is implemented using fread().
 
-** Function: `file_write`**
+**Function: `file_write`**
 
 file_write -- Writes the specified data to the file. Returns number of bytes written.
 
@@ -4416,7 +4418,7 @@ Not recommended for use on files in text mode.
 
 This is implemented using fwrite().
 
-** Function: `file_flush`**
+**Function: `file_flush`**
 
 file_flush -- Flushes buffered writes for the file.
 
@@ -4424,17 +4426,19 @@ void `file_flush`(FHANDLE fh)
 
 This is implemented using fflush().
 
-** Function: `file_count_lines`**
+**Function: `file_count_lines`**
 
 file_count_lines -- count the lines in a file
 
-INT `file_count_lines` (FHANDLER fh)
+INT `file_count_lines` (FHANDLE fh)
 
-** Function: `file_grep`**
+This rewinds the file and reads to EOF while counting, leaving the stream positioned at EOF.
+
+**Function: `file_grep`**
 
 file_grep -- search for a string in a file
 
-LIST `file_grep`(FHANDLER fh, STR search [,?match_all = 0])
+LIST `file_grep`(FHANDLE fh, STR search [,?match_all = 0])
 
 Assume we have a file `test.txt` with the contents:
 
@@ -4444,7 +4448,7 @@ asdf asdf 11
 112
 ```
 
-And we have an open file handler from running:
+And we have an open file handle from running:
 
 ```
 ;file_open("test.txt", "r-tn")
@@ -4478,7 +4482,7 @@ we will receive all the matching results:
 
 **Getting and setting stream position**
 
-** Function: `file_tell`**
+**Function: `file_tell`**
 
 file_tell -- Returns position in file.
 
@@ -4486,7 +4490,7 @@ INT `file_tell`(FHANDLE fh)
 
 This is implemented using ftell().
 
-** Function: `file_seek`**
+**Function: `file_seek`**
 
 file_seek -- Seeks to a particular location in a file.  
 
@@ -4500,7 +4504,7 @@ whence is one of the strings:
 
 This is implemented using fseek().
 
-** Function: `file_eof`**
+**Function: `file_eof`**
 
 file_eof -- Returns true if and only if fh's stream is positioned at EOF.
 
@@ -4510,15 +4514,15 @@ This is implemented using feof().
 
 **Housekeeping operations**
 
-** Function: `file_size`**
+**Function: `file_size`**
 
-** Function: `file_last_access`**
+**Function: `file_last_access`**
 
-** Function: `file_last_modify`**
+**Function: `file_last_modify`**
 
-** Function: `file_last_change`**
+**Function: `file_last_change`**
 
-** Function: `file_size`**
+**Function: `file_size`**
 
 int `file_size`(STR pathname)
 
@@ -4538,21 +4542,21 @@ int `file_last_change`(FHANDLE filehandle)
 
 Returns the size, last access time, last modify time, or last change time of the specified file.   All of these functions also take FHANDLE arguments and then operate on the open file.
 
-** Function: `file_mode`**
+**Function: `file_mode`**
 
-int `file_mode`(STR filename)
+str `file_mode`(STR filename)
 
-int `file_mode`(FHANDLE fh)
+str `file_mode`(FHANDLE fh)
 
 Returns octal mode for a file (e.g. "644").
 
-This is implemented using stat().
+This is implemented using stat() or fstat().
 
-**file_stat**
+**Function: `file_stat`**
 
-void `file_stat`(STR pathname)
+list `file_stat`(STR pathname)
 
-void `file_stat`(FHANDLE fh)
+list `file_stat`(FHANDLE fh)
 
 Returns the result of stat() (or fstat()) on the given file.
 
@@ -4564,7 +4568,7 @@ owner and group are always the empty string.
 
 It is recommended that the specific information functions file_size, file_type, file_mode, file_last_access, file_last_modify, and file_last_change be used instead.  In most cases only one of these elements is desired and in those cases there's no reason to make and free a list.
 
-** Function: `file_rename`**
+**Function: `file_rename`**
 
 file_rename - Attempts to rename the oldpath to newpath.
 
@@ -4572,10 +4576,10 @@ void `file_rename`(STR oldpath, STR newpath)
 
 This is implemented using rename().
 
-**file_remove**
+**Function: `file_remove`**
 
 file_remove -- Attempts to remove the given file.
- 
+
 void `file_remove`(STR pathname)
 
 This is implemented using remove().
@@ -4612,15 +4616,17 @@ normal entry:
 
 STR filename
 
-This is implemented using scandir().
+This is implemented using `opendir()` and `readdir()`; output order is not guaranteed.
 
 **Function: `file_type`**
 
-file_type -- Returns the type of the given pathname, one of "reg", "dir", "dev", "fifo", or "socket".
+file_type -- Returns the type of the given pathname or handle, one of "reg", "dir", "fifo", "block", "socket", or "unknown".
 
 STR `file_type`(STR pathname)
 
-This is implemented using stat().
+STR `file_type`(FHANDLE fh)
+
+This is implemented using stat() or fstat().
 
 **Function: `file_chmod`**
 
