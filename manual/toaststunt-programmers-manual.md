@@ -2655,9 +2655,9 @@ Returns the JSON representation of the MOO value.
 
 MOO supports a richer set of values than JSON allows. The optional mode specifies how this function handles the conversion of MOO values into their JSON representation.
 
-The common subset mode, specified by the literal mode string "common-subset", is the default conversion mode. In this mode, only the common subset of types (strings and numbers) are translated with fidelity between MOO types and JSON types. All other types are treated as alternative representations of the string type. This mode is useful for integration with non-MOO applications.
+The common subset mode, specified by the literal mode string "common-subset", is the default conversion mode. In this mode, strings, numbers, and booleans are translated with fidelity between MOO types and JSON types. All other types are treated as alternative representations of the string type. This mode is useful for integration with non-MOO applications.
 
-The embedded types mode, specified by the literal mode string "embedded-types", adds type information. Specifically, values other than strings and numbers, which carry implicit type information, are converted into strings with type information appended. The converted string consists of the string representation of the value (as if tostr() were applied) followed by the pipe (|) character and the type. This mode is useful for serializing/deserializing objects and collections of MOO values.
+The embedded types mode, specified by the literal mode string "embedded-types", adds type information. Specifically, values other than strings, numbers, and booleans, which carry implicit type information, are converted into strings with type information appended. The converted string consists of the string representation of the value (as if tostr() were applied) followed by the pipe (|) character and the type. This mode is useful for serializing/deserializing objects and collections of MOO values.
 
 The optional disable_binary_escapes argument controls whether MOO binary string sequences (like ~08 or ~1F) are converted to JSON escape sequences. By default, these sequences are converted (e.g., ~08 becomes \b). If disable_binary_escapes is true, these sequences pass through unchanged. This is useful when working with literal strings that contain ~0 or ~1 followed by hexadecimal digits.
     
@@ -2669,6 +2669,7 @@ generate_json(["foo" -> "bar"], "embedded-types")           =>  "{\"foo\":\"bar\
 generate_json(["foo" -> 1.1])                               =>  "{\"foo\":1.1}"
 generate_json(["foo" -> 1.1], "common-subset")              =>  "{\"foo\":1.1}"
 generate_json(["foo" -> 1.1], "embedded-types")             =>  "{\"foo\":1.1}"
+generate_json(["foo" -> true, "bar" -> false])              =>  "{\"bar\":false,\"foo\":true}"
 generate_json(["foo" -> #1])                                =>  "{\"foo\":\"#1\"}"
 generate_json(["foo" -> #1], "common-subset")               =>  "{\"foo\":\"#1\"}"
 generate_json(["foo" -> #1], "embedded-types")              =>  "{\"foo\":\"#1|obj\"}"
@@ -2715,6 +2716,7 @@ parse_json("{\"foo\":\"bar\"}", "embedded-types")           =>  ["foo" -> "bar"]
 parse_json("{\"foo\":1.1}")                                 =>  ["foo" -> 1.1]
 parse_json("{\"foo\":1.1}", "common-subset")                =>  ["foo" -> 1.1]
 parse_json("{\"foo\":1.1}", "embedded-types")               =>  ["foo" -> 1.1]
+parse_json("{\"foo\":true,\"bar\":false,\"baz\":null}")      =>  ["bar" -> false, "baz" -> E_NONE, "foo" -> true]
 parse_json("{\"foo\":\"#1\"}")                              =>  ["foo" -> "#1"]
 parse_json("{\"foo\":\"#1\"}", "common-subset")             =>  ["foo" -> "#1"]
 parse_json("{\"foo\":\"#1|obj\"}", "embedded-types")        =>  ["foo" -> #1]
@@ -2732,7 +2734,7 @@ parse_json("{\"1|int\":2}", "embedded-types")               =>   [1 -> 2]
 parse_json("{\"#1|obj\":2}", "embedded-types")              =>   [#1 -> 2]
 ```
 
-JSON `null` values are converted to `E_NONE`.
+JSON boolean values are converted to MOO BOOL values. JSON `null` values are converted to `E_NONE`.
 
 ```
 parse_json("{\"foo\":null}")                                =>   ["foo" -> E_NONE]
@@ -3050,7 +3052,7 @@ index("Foobar", "foo", 1)       ⇒   0
 
 strtr -- Transforms the string source by replacing the characters specified by str1 with the corresponding characters specified by str2.
 
-int `strtr` (str source, str str1, str str2 [, case-matters])
+str `strtr` (str source, str str1, str str2 [, case-matters])
 
 All other characters are not transformed. If str2 has fewer characters than str1 the unmatched characters are simply removed from source. By default the transformation is done on both upper and lower case characters no matter the case. If case-matters is provided and true, then case is treated as significant.
 
@@ -3180,7 +3182,7 @@ If the spelling is correct, the function will return a 1. If the spelling is inc
 
 chr -- This function translates integers into ASCII characters. Each argument must be an integer between 0 and 255.
 
-int `chr`(INT arg, ...)
+str `chr`(INT arg, ...)
 
 If the programmer is not a wizard, and integers less than 32 are provided, E_INVARG is raised. This prevents control characters or newlines from being written to the database file by non-trusted individuals.
 
@@ -3252,7 +3254,7 @@ The return value is a list of maps containing each match. Each returned map will
 
 If `repeat until no matches` is 1, the expression will continue to be evaluated until no further matches can be found or it exhausts the iteration limit. This defaults to 1.
 
-Empty subjects are valid. If the pattern does not match the empty string, the result is an empty list.
+Empty patterns raise `E_INVARG`. Empty subjects are valid, but the current implementation returns an empty list without attempting a zero-length match.
 
 Additionally, wizards can control how many iterations of the loop are possible by adding a property to $server_options. $server_options.pcre_match_max_iterations is the maximum number of loops allowed before giving up and allowing other tasks to proceed. CAUTION: It's recommended to keep this value fairly low. The default value is 1000. The minimum value is 100.
 
@@ -3431,6 +3433,8 @@ str `argon2` (STR password, STR salt [, iterations = 3] [, memory usage in KB = 
 
 The salt for the password should, at minimum, be 16 bytes for password hashing. It is recommended to use the random_bytes() function.
 
+The programmer must be a wizard, or `E_PERM` is raised.
+
 ```
 salt = random_bytes(20);
 return argon2(password, salt, 3, 4096, 1);
@@ -3445,6 +3449,8 @@ argon2_verify -- Compares password to the previously hashed hash.
 int argon2_verify (STR hash, STR password)
 
 Returns 1 if the two match or 0 if they don't. 
+
+The programmer must be a wizard, or `E_PERM` is raised.
 
 This is a more secure way to hash passwords than the `crypt()` builtin.
 
@@ -3726,7 +3732,7 @@ mapkeys(x)   =>  {"bar", "baz", "foo"}
 
 mapvalues -- returns the values of the elements of a map.
 
-list `mapvalues` (MAP `map` [, ... STR `key`])
+list `mapvalues` (MAP `map` [, ... ANY `key`])
 
 If you only want the values of specific keys in the map, you can specify them as optional arguments. See examples below.
 
@@ -5179,7 +5185,7 @@ str `curl` (STR url [, INT include_headers [, INT timeout]])
 
 The curl builtin will download a webpage and return it as a string. If include_headers is true, the HTTP headers will be included in the return string.
 
-If outbound networking is disabled at runtime, `curl()` raises `E_PERM` with a value indicating that outbound network connections are disabled.
+The programmer must be a wizard, or `E_PERM` is raised. If outbound networking is disabled at runtime, `curl()` raises `E_PERM` with a value indicating that outbound network connections are disabled.
 
 It's worth noting that the data you get back will be binary encoded. In particular, you will find that line breaks appear as ~0A. You can easily convert a page into a list by passing the return string into the decode_binary() function.
 
