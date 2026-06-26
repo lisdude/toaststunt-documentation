@@ -4918,6 +4918,8 @@ int `buffered_output_length` ([obj conn])
 
 If conn is not provided, returns the maximum number of bytes that will be buffered up for output on any connection.
 
+If conn is provided but is not a currently-active connection, then `E_INVARG` is raised. If the programmer is not conn or a wizard, then `E_PERM` is raised.
+
 **Function: `read`**
 
 read -- reads and returns a line of input from the connection conn (or, if not provided, from the player that typed the command that initiated the current task)

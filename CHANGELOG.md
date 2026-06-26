@@ -16,6 +16,7 @@
 * Corrected source-audited string, map, JSON, PCRE, curl, and Argon2 documentation details
 * Corrected source-audited object-helper documentation for `owned_objects()`, `locations()`, `occupants()`, `next_recycled_object()`, and `object_bytes()`
 * Corrected source-audited task and server documentation for `set_thread_mode()` and `server_version()`
+* Corrected `buffered_output_length()` error documentation and cleaned up stale function-help syntax examples
 
 ## 1.2.4 - 2026.06.25
 * Updated the programmers manual for recent ToastStunt 2.7.2, 2.7.3, and 2.8.0 behavior changes
