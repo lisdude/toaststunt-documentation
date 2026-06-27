@@ -1,5 +1,8 @@
 # Changelog for toaststunt-documentation repo
 
+## 2026.06.26
+* Added direct function help entries for source-audited builtin parity gaps: `file_size()`, `file_last_access()`, `file_last_modify()`, `file_last_change()`, `connection_options()`, `unlisten()`, `eval()`, and `server_version()`.
+
 ## 2026.06.25
 * Consolidated the repository and manual changelogs into this top-level changelog
 * Moved contributors documentation to the repository root
