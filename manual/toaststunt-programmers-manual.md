@@ -1487,7 +1487,7 @@ changes the value of the `foo` property of the object numbered 27 to be 17 and t
 
 #### Calling Built-in Functions and Other Verbs
 
-MOO provides a large number of useful functions for performing a wide variety of operations; a complete list, giving their names, arguments, and semantics, appears in a separate section later. As an example to give you the idea, there is a function named `length` that returns the length of a given string or list.
+MOO provides a large number of useful functions for performing a wide variety of operations; a complete list, giving their names, arguments, and semantics, appears in a separate section later. As an example to give you the idea, there is a function named `length` that returns the length of a given string, list, or map.
 
 The syntax of a call to a function is as follows:
 
@@ -1495,7 +1495,7 @@ The syntax of a call to a function is as follows:
 name(expr-1, expr-2, ..., expr-N)
 ```
 
-where name is the name of one of the built-in functions. The expressions between the parentheses, called _arguments_, are each evaluated in turn and then given to the named function to use in its appropriate way. Most functions require that a specific number of arguments be given; otherwise, `E_ARGS` is raised. Most also require that certain of the arguments have certain specified types (e.g., the `length()` function requires a list or a string as its argument); `E_TYPE` is raised if any argument has the wrong type.
+where name is the name of one of the built-in functions. The expressions between the parentheses, called _arguments_, are each evaluated in turn and then given to the named function to use in its appropriate way. Most functions require that a specific number of arguments be given; otherwise, `E_ARGS` is raised. Most also require that certain of the arguments have certain specified types (e.g., the `length()` function requires a string, list, or map as its argument); `E_TYPE` is raised if any argument has the wrong type.
 
 As with list construction, the splicing operator `@` can precede any argument expression. The value of such an expression must be a list; `E_TYPE` is raised otherwise. The elements of this list are passed as individual arguments, in place of the list as a whole.
 
@@ -2987,7 +2987,7 @@ length -- Returns the number of characters in string.
 
 int `length` (str string)
 
-It is also permissible to pass a list to `length()`; see the description in the next section.
+It is also permissible to pass a list or map to `length()`; see the description in the next section.
 
 ```
 length("foo")   =>   3
@@ -3169,11 +3169,11 @@ If the spelling is correct, the function will return a 1. If the spelling is inc
 
 **Function: `chr`**
 
-chr -- This function translates integers into ASCII characters. Each argument must be an integer between 0 and 255.
+chr -- This function translates byte values into ASCII characters. Arguments may be integers, strings, or lists of values that can be encoded as bytes.
 
-str `chr`(INT arg, ...)
+str `chr`(INT|STR|LIST arg, ...)
 
-If the programmer is not a wizard, and integers less than 32 are provided, E_INVARG is raised. This prevents control characters or newlines from being written to the database file by non-trusted individuals.
+For wizard programmers, integer byte values may be between 0 and 255. If the programmer is not a wizard, integer byte values must be between 32 and 254; otherwise, `E_INVARG` is raised. This prevents control characters, newlines, and invalid byte values from being written to the database file by non-trusted individuals.
 
 **Function: `match`**
 
@@ -3275,9 +3275,9 @@ The pattern string has a specific format that must be followed, which should be 
 
 1. Type of search to perform. In MOO, only 's' is valid. This parameter is kept for the sake of consistency.
 
-2. The text you want to search for a replacement.
+2. The regular expression pattern to match.
 
-3. The regular expression you want to use for your replacement text.
+3. The replacement text to substitute for each match.
 
 4. Optional modifiers:
     * Global. This will replace all occurrences in your string rather than stopping at the first.
@@ -3503,15 +3503,16 @@ This can be useful, for example, in applications that need to verify both the in
 
 **Function: `length`**
 
-length -- Returns the number of elements in list.
+length -- Returns the number of elements in list or map.
 
-int `length` (list list)
+int `length` (list|map value)
 
 It is also permissible to pass a string to `length()`; see the description in the previous section.
 
 ```
 length({1, 2, 3})   =>   3
 length({})          =>   0
+length(["a" -> 1])  =>   1
 ```
 
 **Function: `is_member`**
@@ -3631,7 +3632,9 @@ setremove({1, 2, 3, 2}, 2)   =>   {1, 3, 2}
 
 reverse -- Return a reversed list or string
 
-str | list `reverse`(LIST alist)
+str | list `reverse`(LIST|STR value)
+
+If value is neither a list nor a string, `E_INVARG` is raised.
 
 Examples:
 
@@ -3665,6 +3668,8 @@ sort -- Sorts list either by keys or using the list itself.
 list `sort`(LIST list [, LIST keys, INT natural sort order?, INT reverse])
 
 When sorting list by itself, you can use an empty list ({}) for keys to specify additional optional arguments.
+
+When sorting by a non-empty keys list, the keys list must be the same length as list, or `E_INVARG` is raised. The values used for sorting must be homogeneous scalar values. Lists, maps, anonymous objects, and WAIFs cannot be sorted and raise `E_TYPE`.
 
 If natural sort order is true, strings containing multi-digit numbers will consider those numbers to be a single character. So, for instance, this means that 'x2' would come before 'x11' when sorted naturally because 2 is less than 11. This argument defaults to 0.
 
@@ -3725,6 +3730,8 @@ list `mapvalues` (MAP `map` [, ... ANY `key`])
 
 If you only want the values of specific keys in the map, you can specify them as optional arguments. See examples below.
 
+If any requested key is not present in the map, `E_RANGE` is raised.
+
 Examples:  
 
 ```
@@ -3734,16 +3741,18 @@ mapvalues(x, "foo", "baz") => {1, 3}
 ```
 
 **Function: `mapdelete`**
-mapdelete -- Returns a copy of map with the value corresponding to key(s) removed. If key is not a valid key, then E_RANGE is raised.
+mapdelete -- Returns a copy of map with the value corresponding to key(s) removed.
 
 map `mapdelete` (MAP map, key|LIST keys)
+
+If a key is a collection value, such as a list or map, then `E_TYPE` is raised. If a key is valid but is not present in the map, then `E_RANGE` is raised.
 
 ```
 x = ["foo" -> 1, "bar" -> 2, "baz" -> 3];
 mapdelete(x, "bar")   ⇒   ["baz" -> 3, "foo" -> 1]
 ```
 
-When passed a list as the second argument, mapdelete() will now delete multiple keys from the map in a single operation. If any key in the list is not found, a descriptive error is raised showing which key was missing.
+When passed a list as the second argument, mapdelete() will now delete multiple keys from the map in a single operation. If any key in the list is not found, `E_RANGE` is raised with a descriptive value showing which key was missing.
 
 **Function: `maphaskey`**
 
@@ -3930,13 +3939,15 @@ Raises `E_TYPE` if parent is provided and is not an object or list of objects. R
 
 **Function: `recycle`**
 
-recycle -- destroy object irrevocably.
+recycle -- destroy object or anonymous object irrevocably.
 
-none `recycle` (obj object)
+none `recycle` (OBJ|ANON object)
 
-The given object is destroyed, irrevocably. The programmer must either own object or be a wizard; otherwise, `E_PERM` is raised. If object is not valid, then `E_INVARG` is raised. The children of object are reparented to the parent of object. Before object is recycled, each object in its contents is moved to `#-1` (implying a call to object's `exitfunc` verb, if any) and then object's `recycle` verb, if any, is called with no arguments.
+The given object is destroyed, irrevocably. The programmer must either own object or be a wizard; otherwise, `E_PERM` is raised. If object is neither a valid permanent object nor an anonymous object, then `E_INVARG` is raised. For permanent objects, the children of object are reparented to the parent of object. Before object is recycled, each object in its contents is moved to `#-1` (implying a call to object's `exitfunc` verb, if any) and then object's `recycle` verb, if any, is called with no arguments.
 
-After object is recycled, if the owner of the former object has a property named `ownership_quota` and the value of that property is a integer, then `recycle()` treats that value as a _quota_ and increments it by one, storing the result back into the `ownership_quota` property.
+Anonymous objects can also be recycled explicitly. They are marked invalid and cleared once no active references remain.
+
+After a permanent object is recycled, if the owner of the former object has a property named `ownership_quota` and the value of that property is a integer, then `recycle()` treats that value as a _quota_ and increments it by one, storing the result back into the `ownership_quota` property.
 
 **Function: `recreate`**
 
@@ -4237,7 +4248,7 @@ new_waif -- The `new_waif()` builtin creates a new WAIF whose class is the calli
 
 waif `new_waif`()
 
-This wizardly version causes it to be owned by the caller of the verb.
+The class is the object that called the current verb, and the owner is the programmer whose permissions the task is running with. There is no alternate wizard-only calling form.
 
 **Function: `waif_stats`**
 
@@ -4799,51 +4810,7 @@ list `sqlite_handles()`
 
 **Function: `exec`**
 
-exec -- Asynchronously executes the specified external executable, optionally sending input.
-
-list `exec` (list command[, str input])
-
-Returns the process return code, output and error. If the programmer is not a wizard, then E_PERM is raised.
-
-The first argument must be a list of strings, or E_INVARG is raised. The first string is the path to the executable and is required. The rest are command line arguments passed to the executable.
-
-The path to the executable may not start with a slash (/) or dot-dot (..), and it may not contain slash-dot (/.) or dot-slash (./), or E_INVARG is raised. If the specified executable does not exist or is not a regular file, E_INVARG is raised.
-
-If the string input is present, it is written to standard input of the executing process.
-
-When the process exits, it returns a list of the form:
-
-`{code, output, error}`
-
-code is the integer process exit status or return code. output and error are strings of data that were written to the standard output and error of the process.
-
-The specified command is executed asynchronously. The function suspends the current task and allows other tasks to run until the command finishes. Tasks suspended this way can be killed with kill_task().
-
-The strings, input, output and error are all MOO binary strings.
-
-All external executables must reside in the executables directory.
-
-```
-exec({"cat", "-?"})                                   ⇒   {1, "", "cat: illegal option -- ?~0Ausage: cat [-benstuv] [file ...]~0A"}
-exec({"cat"}, "foo")                                  ⇒   {0, "foo", ""}
-exec({"echo", "one", "two"})                          ⇒   {0, "one two~0A", ""}
-```
-
-You are able to set environmental variables with `exec`, imagine you had a `vars.sh` (in your executables directory):
-
-```
-#!/bin/bash
-echo "pizza = ${pizza}"
-```
-
-And then you did:
-
-```
-exec({"vars.sh"}, "", {"pizza=tasty"}) => {0, "pizza = tasty~0A", ""}
-exec({"vars.sh"}) => {0, "pizza = ~0A", ""}
-```
-
-The second time pizza doesn't exist. The darkest timeline.
+See the administrative operations section for the full `exec()` documentation, including environment-variable support.
 
 **Function: `getenv`**
 
@@ -5159,6 +5126,8 @@ Optionally, you can specify a map with any or all of the following options:
 
   ipv6:     If true, utilize the IPv6 protocol rather than the IPv4 protocol.
 
+  tls_verify: If true, verify the remote TLS peer. This option is available only when ToastStunt is built with TLS support.
+
 When opening an outbound TLS connection, ToastStunt sends Server Name Indication (SNI) using the supplied host name.
 
 The outbound connection process involves certain steps that can take quite a long time, during which the server is not doing anything else, including responding to user commands and executing MOO tasks.  See the chapter on server assumptions about the database for details about how the server limits the amount of time it will wait for these steps to successfully complete.
@@ -5208,6 +5177,8 @@ Returns a decoded copy of string. If outbound networking is disabled at runtime,
 map `read_http` (request-or-response [, OBJ conn])
 
 Reads lines from the connection conn (or, if not provided, from the player that typed the command that initiated the current task) and attempts to parse the lines as if they are an HTTP request or response. request-or-response must be either the string "request" or "response". It dictates the type of parsing that will be done.
+
+If parsing fails because the request or response is syntactically incorrect, `read_http()` returns a map with the single key `"error"` and a list of values describing the reason for the error. If the queued input cannot be decoded as a valid MOO binary string, `read_http()` returns 0.
 
 Just like read(), if conn is provided, then the programmer must either be a wizard or the owner of conn; if conn is not provided, then read_http() may only be called by a wizard and only in the task that was last spawned by a command from the connection in question. Otherwise, E_PERM is raised. Likewise, if conn is not currently connected and has no pending lines of input, or if the connection is closed while a task is waiting for input but before any lines of input are received, then read_http() raises E_INVARG.
 
@@ -5621,7 +5592,7 @@ If the caller is a wizard a map of debug information about task queues will be r
 
 queued_tasks -- returns information on each of the background tasks (i.e., forked, suspended or reading) owned by the programmer (or, if the programmer is a wizard, all queued tasks)
 
-list `queued_tasks` ([INT show-runtime [, INT count-only]])
+list|int `queued_tasks` ([INT show-runtime-or-count-only [, INT count-only]])
 
 The returned value is a list of lists, each of which encodes certain information about a particular queued task in the following format:
 
@@ -5633,9 +5604,9 @@ where task-id is an integer identifier for this queued task, start-time is the t
 
 The x and y fields are now obsolete and are retained only for backward-compatibility reasons. They may be reused for new purposes in some future version of the server.
 
-If `show-runtime` is true, all variables present in the task are presented in a map with the variable name as the key and its value as the value.     
+If exactly one argument is provided and it is true, all variables present in the task are presented in a map with the variable name as the key and its value as the value. Calling `queued_tasks(1)` includes runtime variables; calling `queued_tasks(0)` does not.
 
-If `count-only` is true, then only the number of tasks is returned. This is significantly more performant than length(queued_tasks()).
+If two arguments are provided and the second argument is true, then only the number of tasks is returned. This is significantly more performant than length(queued_tasks()). Runtime variables are not included when two arguments are provided, so `queued_tasks(1, 0)` returns the normal task list without runtime variables.
 
 > Warning: If you are upgrading to ToastStunt from a version of LambdaMOO prior to 1.8.1 you will need to dump your database, reboot into LambdaMOO emergency mode, and kill all your queued_tasks() before dumping the DB again. Otherwise, your DB will not boot into ToastStunt.
 
@@ -5860,6 +5831,20 @@ All external executables must reside in the executables directory.
 exec({"cat", "-?"})          =>   {1, "", "cat: illegal option -- ?~0Ausage: cat [-benstuv] [file ...]~0A"}
 exec({"cat"}, "foo")         =>   {0, "foo", ""}
 exec({"echo", "one", "two"}) =>   {0, "one two~0A", ""}
+```
+
+For example, if `vars.sh` in the executables directory contains:
+
+```
+#!/bin/bash
+echo "pizza = ${pizza}"
+```
+
+then environment variables can be supplied with the third argument:
+
+```
+exec({"vars.sh"}, "", {"pizza=tasty"}) => {0, "pizza = tasty~0A", ""}
+exec({"vars.sh"})                      => {0, "pizza = ~0A", ""}
 ```
 
 **Function: `shutdown`**

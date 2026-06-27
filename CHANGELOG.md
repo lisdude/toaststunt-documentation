@@ -1,6 +1,7 @@
 # Changelog for toaststunt-documentation repo
 
 ## 2026.06.26
+* Corrected remaining decision-free source-audit findings across the manual and function help, including `open_network_connection()`, `queued_tasks()`, `reverse()`, `length()`, hash helpers, object/WAIF lifecycle notes, `sort()`, map helpers, `chr()`, `pcre_replace()`, and `read_http()`.
 * Cleaned up source-audited manual issues including fork syntax, indexed assignment prose, numeric builtin signatures, FileIO notes, server-option names, checkpoint wording, wizard-only usage reporting, and stale examples.
 * Added direct function help entries for source-audited builtin parity gaps: `file_size()`, `file_last_access()`, `file_last_modify()`, `file_last_change()`, `connection_options()`, `unlisten()`, `eval()`, and `server_version()`.
 
