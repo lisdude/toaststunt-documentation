@@ -158,8 +158,7 @@ This guide is not just a technical document, it also contains opinions (mine and
 
 ### What is ToastStunt?
 
-ToastStunt is a fork of [Stunt](https://github.com/toddsundsted/stunt) which is a fork of of [LambdaMOO](https://en.wikipedia.org/wiki/MOO). At the time of this writing (01/01/22) ToastStunt was under active development. Stunt and LambdaMOO were not. If you are looking for an up to date, feature rich, LambdaMOO, then ToastStunt is for you. It incorporates much of the 'patches' that were released for legacy LambdaMOO, and much more (TLS, better
-FileIO, updated and expanded built-ins functions, multiple inheritance, curl support, and threading to name a few).
+ToastStunt is a fork of [Stunt](https://github.com/toddsundsted/stunt), which is a fork of [LambdaMOO](https://en.wikipedia.org/wiki/MOO). If you are looking for an up-to-date, feature-rich LambdaMOO, then ToastStunt is for you. It incorporates much of the patches that were released for legacy LambdaMOO, and much more, including TLS, better FileIO, updated and expanded built-in functions, multiple inheritance, curl support, and threading.
 
 ## ToastStunt & MOO Resources
 
@@ -1165,11 +1164,7 @@ If index-expr is not an integer (for lists and strings) or is a collection value
 
 For lists, the variable or the property is assigned a new list that is identical to the original one except at the k-th position, where the new list contains the result of result-expr instead. Likewise for maps, the variable or the property is assigned a new map that is identical to the original one except for the k key, where the new map contains the result of result-expr instead. For strings, the variable or the property is assigned a new string that is identical to the original one, except the k-th character is changed to be result-expr.
 
-If index-expr is not an integer, or if the value of variable or the property is not a list or string, `E_TYPE` is raised. If result-expr is a string, but not of length 1, `E_INVARG` is raised. Now suppose index-expr evaluates to an integer n. If n is outside the range of the list or string (i.e. smaller than 1 or greater than the length of the list or string), `E_RANGE` is raised. Otherwise, the actual assignment takes place.
-
-For lists, the variable or the property is assigned a new list that is identical to the original one except at the n-th position, where the new list contains the result of result-expr instead. For strings, the variable or the property is assigned a new string that is identical to the original one, except the n-th character is changed to be result-expr.
-
-The assignment expression itself returns the value of result-expr. For the following examples, assume that `l` initially contains the list `{1, 2, 3}`, that `m` initially contains the map `["one" -> 1, "two" -> 2]` and that `s` initially contains the string "foobar": 
+The assignment expression itself returns the value of result-expr. For the following examples, assume that `l` initially contains the list `{1, 2, 3}`, that `m` initially contains the map `["one" -> 1, "two" -> 2]` and that `s` initially contains the string "foobar":
 
 ```
 l[5] = 3          =>   E_RANGE (error)
@@ -2115,7 +2110,7 @@ In the above example, `player:tell("You get out another ball!");` will not be ex
 player:tell("You throw the ball!");
 fork (1)
     ball:calculate_trajectory();
-endfor
+endfork
 player:tell("You get out another ball!");
 ```
 
@@ -2768,7 +2763,7 @@ If only one argument is given, a floating point number is chosen randomly from t
 
 **Function: `random_bytes`**
 
-int `random_bytes` (int count)
+str `random_bytes` (int count)
 
 Returns a binary string composed of between one and 10000 random bytes. count specifies the number of bytes and must be a positive integer; otherwise, E_INVARG is raised. 
 
@@ -2782,7 +2777,7 @@ void `reseed_random`()
 
 min -- Return the smallest of it's arguments.
 
-int `min` (int x, ...)
+int|float `min` (int|float x, ...)
 
 All of the arguments must be numbers of the same kind (i.e., either integer or floating-point); otherwise `E_TYPE` is raised.
 
@@ -2790,7 +2785,7 @@ All of the arguments must be numbers of the same kind (i.e., either integer or f
 
 max -- Return the largest of it's arguments.
 
-int `max` (int x, ...)
+int|float `max` (int|float x, ...)
 
 All of the arguments must be numbers of the same kind (i.e., either integer or floating-point); otherwise `E_TYPE` is raised.
 
@@ -2798,15 +2793,9 @@ All of the arguments must be numbers of the same kind (i.e., either integer or f
 
 abs -- Returns the absolute value of x.
 
-int `abs` (int x)
+int|float `abs` (int|float x)
 
 If x is negative, then the result is `-x`; otherwise, the result is x. The number x can be either integer or floating-point; the result is of the same kind.
-
-**Function: `exp`**
-
-exp -- Returns E (Eulers number) raised to the power of x.
-
-float exp (FLOAT x)
 
 **Function: `floatstr`**
 
@@ -4007,8 +3996,7 @@ max_object -- Returns the largest object number ever assigned to a created objec
 
 obj `max_object`()
 
-//TODO update for how Toast handles recycled objects if it is different
-Note that the object with this number may no longer exist; it may have been recycled.  The next object created will be assigned the object number one larger than the value of `max_object()`. The next object getting the number one larger than `max_object()` only applies if you are using built-in functions for creating objects and does not apply if you are using the `$recycler` to create objects.
+Note that the object with this number may no longer exist; it may have been recycled. The next object created by the built-in `create()` function will normally be assigned the object number one larger than the value of `max_object()`, unless object numbers are being reused through `recreate()` or `reset_max_object()` has lowered the server's maximum object number. This does not apply to database-level recycler utilities such as `$recycler`, which may choose to reuse object numbers explicitly.
 
 ##### Object Movement
 
@@ -4295,7 +4283,7 @@ Granting MOO code direct access to files opens a hole in the otherwise fairly go
 
 > Warning: Depending on what Core you are using (ToastCore, LambdaMOO, etc) you may have a utility that acts as a wrapper around the FileIO code. This is the preferred method for dealing with files and directly using the built-ins is discouraged. On ToastCore you may have a $file WAIF you can utilize for this purpose.
 
-> Warning: The FileIO code looks for a 'files' directory in the same directory as the MOO executable. This directory must exist for your code to work.
+> Warning: FileIO uses the configured file directory, defaulting to `files/` under the server's working directory unless overridden by `-i` or `--file-dir`. This directory must exist for FileIO built-ins to work.
 
 > Note: More detailed information regarding the FileIO code can be found in the docs/FileioDocs.txt folder of the ToastStunt repo.
 
@@ -4536,8 +4524,6 @@ This is implemented using feof().
 
 **Function: `file_last_change`**
 
-**Function: `file_size`**
-
 int `file_size`(STR pathname)
 
 int `file_last_access`(STR pathname)
@@ -4554,7 +4540,7 @@ int `file_last_modify`(FHANDLE filehandle)
 
 int `file_last_change`(FHANDLE filehandle)
 
-Returns the size, last access time, last modify time, or last change time of the specified file.   All of these functions also take FHANDLE arguments and then operate on the open file.
+These functions return the size, last access time, last modification time, or last status-change time of the specified file. All of them also accept FHANDLE arguments and then operate on the open file. They are implemented using `stat()` or `fstat()`.
 
 **Function: `file_mode`**
 
@@ -4869,7 +4855,7 @@ If no such environment variable exists, 0 is returned. If the programmer is not 
 
 ```
 getenv("HOME")                                          ⇒   "/home/foobar"
-getenv("XYZZY")      
+getenv("XYZZY")                                         ⇒   0
 ```
 
 ##### Operations on Network Connections
@@ -5080,9 +5066,7 @@ set_connection_option -- controls a number of optional behaviors associated the 
 
 none `set_connection_option` (obj conn, str option, value)
 
-Raises E_INVARG if conn does not specify a current connection and E_PERM if the programmer is neither conn nor a wizard. Unless otherwise specified below, options can only be set (value is true) or unset (otherwise). The following values for option are currently supported: 
-
-The following values for option are currently supported:
+Raises E_INVARG if conn does not specify a current connection and E_PERM if the programmer is neither conn nor a wizard. Unless otherwise specified below, options can only be set (value is true) or unset (otherwise). The following values for option are currently supported:
 
 `"binary"`
 When set, the connection is in binary mode, in which case both input from and output to conn can contain arbitrary bytes. Input from a connection in binary mode is not broken into lines at all; it is delivered to either the read() function or normal command parsing as binary strings, in whatever size chunks come back from the operating system. (See fine point on binary strings, for a description of the binary string representation.) For output to a connection in binary mode, the second argument to `notify()` must be a binary string; if it is malformed, E_INVARG is raised.
@@ -5663,7 +5647,7 @@ none `kill_task` (int task-id)
 
 If the programmer is not the owner of that task and not a wizard, then `E_PERM` is raised. If there is no task on the queue with the given task-id, then `E_INVARG` is raised.
 
-**Function: `finished_tasks()`**
+**Function: `finished_tasks`**
 
 finished_tasks -- returns a list of the last X tasks to finish executing, including their total execution time
 
@@ -5801,6 +5785,8 @@ This function is available only when ToastStunt is built with jemalloc. The retu
 usage -- Return statistics concerning the server the MOO is running on.
 
 list `usage` ()
+
+If the programmer is not a wizard, then `E_PERM` is raised.
 
 The result is a list in the following format:
 
@@ -6071,7 +6057,6 @@ The specific properties searched for are each described in the appropriate secti
 | fg_seconds                       | The number of seconds allotted to foreground tasks.                                                                                                        |
 | fg_ticks                         | The number of ticks allotted to foreground tasks.                                                                                                          |
 | max_stack_depth                  | The maximum number of levels of nested verb calls. Only used if it is higher than default                                                                  |
-| name_lookup_timeout              | The maximum number of seconds to wait for a network hostname/address lookup.                                                                               |
 | outbound_connect_timeout         | The maximum number of seconds to wait for an outbound network connection to successfully open.                                                             |
 | protect_`property`               | Restrict reading/writing of built-in `property` to wizards.                                                                                                |
 | protect_`function`               | Restrict use of built-in `function` to wizards.                                                                                                            |
@@ -6086,9 +6071,10 @@ The specific properties searched for are each described in the appropriate secti
 | task_lag_threshold               | override default task_lag_threshold for handling lagging tasks                                                                                             |
 | finished_tasks_limit             | override default finished_tasks_limit (enables the finished_tasks function and define how many tasks get saved by default)                                 |
 | no_name_lookup                   | override default no_name_lookup (disables automatic DNS name resolution on new connections)                                                                |
-| max_list_concat                  | limit the size of user-constructed lists                                                                                                                   |
+| max_list_value_bytes             | limit the size, in bytes, of user-constructed lists                                                                                                        |
 | max_string_concat                | limit the size of user-constructed strings                                                                                                                 |
 | max_concat_catchable | govern whether violating concat size limits causes out-of-seconds or E_QUOTA error |
+| include_rt_vars                  | include runtime variable data in tracebacks when enabled                                                                                                   |
 
 > Note: If you override a default value that was defined in options.h (such as no_name_lookup or finished_tasks_limit, or many others) you will need to call `load_server_options()` for your changes to take affect.
 
@@ -6121,9 +6107,7 @@ The following list covers all of the customizable messages, showing for each the
 
 The server maintains the entire MOO database in main memory, not on disk. It is therefore necessary for it to dump the database to disk if it is to persist beyond the lifetime of any particular server execution. The server is careful to dump the database just before shutting down, of course, but it is also prudent for it to do so at regular intervals, just in case something untoward happens.
 
-//TODO: is the date here still true in 64bit time?
-
-To determine how often to make these _checkpoints_ of the database, the server consults the value of `$server_options.dump_interval`. If it exists and its value is an integer greater than or equal to 60, then it is taken as the number of seconds to wait between checkpoints; otherwise, the server makes a new checkpoint every 3600 seconds (one hour). If the value of `$server_options.dump_interval` implies that the next checkpoint should be scheduled at a time after 3:14:07 a.m. on Tuesday, January 19, 2038, then the server instead uses the default value of 3600 seconds in the future.
+To determine how often to make these _checkpoints_ of the database, the server consults the value of `$server_options.dump_interval`. If it exists and its value is an integer greater than or equal to 60, then it is taken as the number of seconds to wait between checkpoints; otherwise, the server makes a new checkpoint every 3600 seconds (one hour). If the value of `$server_options.dump_interval` would schedule the next checkpoint past the platform's supported time range, then the server instead uses the default value of 3600 seconds in the future.
 
 The decision about how long to wait between checkpoints is made again immediately after each one begins. Thus, changes to `$server_options.dump_interval` will take effect after the next checkpoint happens.
 
@@ -6147,11 +6131,11 @@ where success is true if and only if the checkpoint was successfully written on 
 
 When the server first accepts a new, incoming network connection, it is given the low-level network address of computer on the other end. It immediately attempts to convert this address into the human-readable host name that will be entered in the server log and returned by the `connection_name()` function. This conversion can, for the TCP/IP networking configurations, involve a certain amount of communication with remote name servers, which can take quite a long time and/or fail entirely. While the server is doing this conversion, it is not doing anything else at all; in particular, it it not responding to user commands or executing MOO tasks.
 
-By default, the server will wait no more than 5 seconds for such a name lookup to succeed; after that, it behaves as if the conversion had failed, using instead a printable representation of the low-level address. If the property `name_lookup_timeout` exists on `$server_options` and has an integer as its value, that integer is used instead as the timeout interval.
+By default, the server attempts this name lookup for new connections. If `$server_options.no_name_lookup` is true, automatic DNS name resolution is disabled and the server uses a printable representation of the low-level address instead.
 
-When the `open_network_connection()` function is used, the server must again do a conversion, this time from the host name given as an argument into the low-level address necessary for actually opening the connection. This conversion is subject to the same timeout as in the in-bound case; if the conversion does not succeed before the timeout expires, the connection attempt is aborted and `open_network_connection()` raises `E_QUOTA`.
+When the `open_network_connection()` function is used, the server must again do a conversion, this time from the host name given as an argument into the low-level address necessary for actually opening the connection. If address lookup fails, the connection attempt is aborted and `open_network_connection()` raises `E_INVARG` with diagnostic information.
 
-After a successful conversion, though, the server must still wait for the actual connection to be accepted by the remote computer. As before, this can take a long time during which the server is again doing nothing else. Also as before, the server will by default wait no more than 5 seconds for the connection attempt to succeed; if the timeout expires, `open_network_connection()` again raises `E_QUOTA`. This default timeout interval can also be overridden from within the database, by defining the property `outbound_connect_timeout` on `$server_options` with an integer as its value.
+After a successful conversion, though, the server must still wait for the actual connection to be accepted by the remote computer. As before, this can take a long time during which the server is again doing nothing else. The server will by default wait no more than 5 seconds for the connection attempt to succeed; if the timeout expires, `open_network_connection()` raises `E_QUOTA`. This default timeout interval can be overridden from within the database by defining the property `outbound_connect_timeout` on `$server_options` with an integer as its value.
 
 #### Associating Network Connections with Players
 
