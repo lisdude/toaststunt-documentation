@@ -1,4 +1,4 @@
-# ToastStunt Programmer's Manual Version 1.2.4
+# ToastStunt Programmer's Manual Version 1.2.5
 
 ## Written for ToastStunt Version 2.8+
 
@@ -2219,7 +2219,7 @@ Anonymous objects can be stored in maps as either the key or the value:
 
 Anonymous objects technically have a player flag and children lists, but you can't actually do anything with them. Same with the majority of the built-in properties. They exist but are meaningless. You also cannot add new properties or verbs directly to an anonymous object. Generally speaking, this makes WAIFs a better choice in most situations, as they are lighter weight.
 
-As of ToastStunt 2.8.0, anonymous objects that inherit from a parent are no longer invalidated merely because that parent's properties change.
+When a property is added to or deleted from a permanent parent, its anonymous children gain or lose that inherited property. Changing the parent's own parents updates the properties inherited by its anonymous children. These changes do not invalidate the anonymous objects. Define and edit properties and verbs on permanent parents. Inherited property values can be read, assigned, and cleared on anonymous objects, subject to normal permissions.
 
 > Warning: Similar to WAIFs, you want to take care in how you are creating Anonymous Objects, as once they are created, if you continue to reference them in a property, you may have trouble finding them in the future, as there is no way to pull up a list of all Anonymous Objects.
 
@@ -2654,7 +2654,7 @@ The common subset mode, specified by the literal mode string "common-subset", is
 
 The embedded types mode, specified by the literal mode string "embedded-types", adds type information. Specifically, values other than strings, numbers, and booleans, which carry implicit type information, are converted into strings with type information appended. The converted string consists of the string representation of the value (as if tostr() were applied) followed by the pipe (|) character and the type. This mode is useful for serializing/deserializing objects and collections of MOO values.
 
-The optional disable_binary_escapes argument controls whether MOO binary string sequences (like ~08 or ~1F) are converted to JSON escape sequences. By default, these sequences are converted (e.g., ~08 becomes \b). If disable_binary_escapes is true, these sequences pass through unchanged. This is useful when working with literal strings that contain ~0 or ~1 followed by hexadecimal digits.
+The optional disable_binary_escapes argument controls how MOO binary strings are converted to JSON. By default, sequences from ~00 through ~1F are converted to JSON escape sequences (for example, ~08 becomes \b). A true disable_binary_escapes argument leaves these sequences unchanged. Raw control characters are always escaped for JSON. A tilde that is not followed by two hexadecimal digits is left unchanged.
     
 ```
 generate_json([])                                           =>  "{}"
@@ -2680,6 +2680,8 @@ generate_json([1 -> 2])                                     =>  "{\"1\":2}"
 generate_json([1 -> 2], "common-subset")                    =>  "{\"1\":2}"
 generate_json([1 -> 2], "embedded-types")                   =>  "{\"1|int\":2}"
 generate_json([#1 -> 2], "embedded-types")                  =>  "{\"#1|obj\":2}"
+generate_json([true -> 1])                                 =>  "{\"true\":1}"
+generate_json([false -> 2], "embedded-types")              =>  "{\"false|bool\":2}"
 ```
 
 Binary string escape processing examples:
@@ -2701,7 +2703,7 @@ value parse_json (str json [, str mode])
 
 If the specified string is not valid JSON, E_INVARG is raised.
 
-The optional mode specifies how this function handles conversion of MOO values into their JSON representation. The options are the same as for generate_json().
+The optional mode controls how JSON strings and object keys are interpreted. In `"common-subset"` mode (the default), they are returned as MOO strings. In `"embedded-types"` mode, type tags are used to reconstruct MOO values; see `generate_json()` for the encoding format.
 
 ```
 parse_json("{}")                                            =>  []
@@ -2720,13 +2722,14 @@ parse_json("{\"foo\":\"E_PERM\"}", "common-subset")         =>  ["foo" -> "E_PER
 parse_json("{\"foo\":\"E_PERM|err\"}", "embedded-types")    =>  ["foo" -> E_PERM]
 ```
 
-In embedded types mode, key values can be converted to MOO types by appending type information. The full set of supported types are obj, str, err, float and int.
+In embedded types mode, key values can be converted to MOO types by appending type information. The supported type tags are `obj`, `str`, `err`, `float`, `int`, and `bool`. Boolean keys use `"true|bool"` or `"false|bool"` and round-trip as MOO BOOL values.
     
 ```
 parse_json("{\"1\":2}")                                     =>   ["1" -> 2]
 parse_json("{\"1\":2}", "common-subset")                    =>   ["1" -> 2]
 parse_json("{\"1|int\":2}", "embedded-types")               =>   [1 -> 2]
 parse_json("{\"#1|obj\":2}", "embedded-types")              =>   [#1 -> 2]
+parse_json("{\"false|bool\":2}", "embedded-types")          =>   [false -> 2]
 ```
 
 JSON boolean values are converted to MOO BOOL values. JSON `null` values are converted to `E_NONE`.
@@ -3745,7 +3748,7 @@ mapdelete -- Returns a copy of map with the value corresponding to key(s) remove
 
 map `mapdelete` (MAP map, key|LIST keys)
 
-If a key is a collection value, such as a list or map, then `E_TYPE` is raised. If a key is valid but is not present in the map, then `E_RANGE` is raised.
+Keys may be integers, floats, strings, object numbers, error values, booleans, WAIFs, or anonymous-object references. Passing a list or map as a key raises `E_TYPE`. If a key is valid but is not present in the map, then `E_RANGE` is raised.
 
 ```
 x = ["foo" -> 1, "bar" -> 2, "baz" -> 3];
@@ -3760,7 +3763,7 @@ maphaskey -- Returns 1 if key exists in map. When not dealing with hundreds of k
 
 int `maphaskey` (MAP map, ANY key [, INT case-matters])
 
-If `case-matters` is true, string-key comparison is case-sensitive. Collection values cannot be used as keys for this lookup; if key is a list, map, or other collection value, then `E_TYPE` is raised.
+If `case-matters` is true, string-key comparison is case-sensitive. Keys may be integers, floats, strings, object numbers, error values, booleans, WAIFs, or anonymous-object references. Passing a list or map as key raises `E_TYPE`.
 
 #### Manipulating Objects
 
@@ -3831,7 +3834,7 @@ none `chparent` (obj object, obj new-parent)
 
 none `chparents` (obj object, list new-parents)
 
-If object is not valid, or if new-parent is neither valid nor equal to `#-1`, then `E_INVARG` is raised. If the programmer is neither a wizard or the owner of object, or if new-parent is not fertile (i.e., its `f` bit is not set) and the programmer is neither the owner of new-parent nor a wizard, then `E_PERM` is raised. If new-parent is equal to `object` or one of its current ancestors, `E_RECMOVE` is raised. If object or one of its descendants defines a property with the same name as one defined either on new-parent or on one of its ancestors, then `E_INVARG` is raised.
+If object is not valid, or if new-parent is neither valid nor equal to `#-1`, then `E_INVARG` is raised. If the programmer is neither a wizard or the owner of object, or if new-parent is not fertile (i.e., its `f` bit is not set) and the programmer is neither the owner of new-parent nor a wizard, then `E_PERM` is raised. If new-parent is equal to `object` or one of its current descendants, `E_RECMOVE` is raised. If object or one of its descendants defines a property with the same name as one defined either on new-parent or on one of its ancestors, then `E_INVARG` is raised.
 
 Changing an object's parent can have the effect of removing some properties from and adding some other properties to that object and all of its descendants (i.e., its children and its children's children, etc.). Let common be the nearest ancestor that object and new-parent have in common before the parent of object is changed. Then all properties defined by ancestors of object under common (that is, those ancestors of object that are in turn descendants of common) are removed from object and all of its descendants. All properties defined by new-parent or its ancestors under common are added to object and all of its descendants. As with `create()`, the newly-added properties are given the same permission bits as they have on new-parent, the owner of each added property is either the owner of the object it's added to (if the `c` permissions bit is set) or the owner of that property on new-parent, and the value of each added property is _clear_; see the description of the built-in function `clear_property()` for details. All properties that are not removed or added in the reparenting process are completely unchanged.
 
@@ -4071,6 +4074,8 @@ set_property_info -- Set the owner and permission bits for the property named pr
 
 none `set_property_info` (obj object, str prop-name, list info)
 
+The object argument must be a permanent object; passing an anonymous object raises `E_TYPE`.
+
 If object is not valid, then `E_INVARG` is raised. If object has no non-built-in property named prop-name, then `E_PROPNF` is raised. If the programmer does not have read (write) permission on the property in question, then `set_property_info()` raises `E_PERM`. Property info has the following form:
 
 ```
@@ -4094,6 +4099,8 @@ If object is not a permanent object, then `E_TYPE` is raised. If object is not v
 delete_property -- Removes the property named prop-name from the given object and all of its descendants.
 
 none `delete_property` (obj object, str prop-name)
+
+The object argument must be a permanent object; passing an anonymous object raises `E_TYPE`.
 
 If object is not valid, then `E_INVARG` is raised. If the programmer does not have write permission on object, then `E_PERM` is raised. If object does not directly define a property named prop-name (as opposed to inheriting one from its parent), then `E_PROPNF` is raised.
 
@@ -4154,6 +4161,8 @@ set_verb_info -- Set the owner, permissions bits, and names(s) for the verb as v
 
 none `set_verb_info` (obj object, str|int verb-desc, list info)
 
+The object argument must be a permanent object; passing an anonymous object raises `E_TYPE`.
+
 If object is not valid, then `E_INVARG` is raised. If object does not define a verb as specified by verb-desc, then `E_VERBNF` is raised. If the programmer does not have read (write) permission on the verb in question, then `verb_info()` (`set_verb_info()`) raises `E_PERM`.
 
 Verb info has the following form:
@@ -4170,11 +4179,15 @@ verb_args -- get the direct-object, preposition, and indirect-object specificati
 
 list `verb_args` (obj object, str|int verb-desc) 
 
+The object argument must be a permanent object; passing an anonymous object raises `E_TYPE`.
+
 **Function: `set_verb_args`**
 
 verb_args -- set the direct-object, preposition, and indirect-object specifications for the verb as specified by verb-desc on the given object.
 
 none `set_verb_args` (obj object, str|int verb-desc, list args)
+
+The object argument must be a permanent object; passing an anonymous object raises `E_TYPE`.
 
 If object is not valid, then `E_INVARG` is raised. If object does not define a verb as specified by verb-desc, then `E_VERBNF` is raised. If the programmer does not have read (write) permission on the verb in question, then the function raises `E_PERM`.
 
@@ -4208,6 +4221,8 @@ delete_verb -- removes the verb as specified by verb-desc from the given object
 
 none `delete_verb` (obj object, str|int verb-desc)
 
+The object argument must be a permanent object; passing an anonymous object raises `E_TYPE`.
+
 If object is not valid, then `E_INVARG` is raised. If the programmer does not have write permission on object, then `E_PERM` is raised. If object does not define a verb as specified by verb-desc, then `E_VERBNF` is raised.
 
 **Function: `verb_code`**
@@ -4221,6 +4236,8 @@ list `verb_code` (obj object, str|int verb-desc [, fully-paren [, indent]])
 set_verb_code -- set the MOO-code program associated with the verb as specified by verb-desc on object
 
 list `set_verb_code` (obj object, str|int verb-desc, list code)
+
+The object argument must be a permanent object; passing an anonymous object raises `E_TYPE`.
 
 The program is represented as a list of strings, one for each line of the program; this is the kind of value returned by `verb_code()` and expected as the third argument to `set_verb_code()`. For `verb_code()`, the expressions in the returned code are usually written with the minimum-necessary parenthesization; if full-paren is true, then all expressions are fully parenthesized.
 
@@ -5144,17 +5161,40 @@ Open a new connection to the IPv6 address 2607:5300:60:4be0:: on port 1234 using
 
 **Function: `curl`**
 
-str `curl` (STR url [, INT include_headers [, INT timeout]])
+value `curl` (STR url [, MAP options])
 
-The curl builtin will download a webpage and return it as a string. If include_headers is true, the HTTP headers will be included in the return string.
+str | map `curl` (STR url [, ANY include_headers [, INT timeout]])
 
-The programmer must be a wizard, or `E_PERM` is raised. If outbound networking is disabled at runtime, `curl()` raises `E_PERM` with a value indicating that outbound network connections are disabled.
+Retrieves the contents of an HTTP, HTTPS, or DICT URL. The programmer must be a wizard and outbound networking must be enabled; otherwise, `E_PERM` is raised. This function is available only when ToastStunt is built with curl support.
 
-It's worth noting that the data you get back will be binary encoded. In particular, you will find that line breaks appear as ~0A. You can easily convert a page into a list by passing the return string into the decode_binary() function.
+`curl(url)` returns the response body as a MOO binary string. In `curl(url, include_headers, timeout)`, a true include_headers value prepends the HTTP response headers to the body, and timeout specifies the time limit in integer seconds. Both arguments are optional.
 
-CURL_TIMEOUT is defined in options.h to specify the maximum amount of time a CURL request can take before failing. For special circumstances, you can specify a longer or shorter timeout using the third argument of curl().
+In `curl(url, options)`, options is a map that configures the request and response format. This call accepts exactly two arguments. Option names and HTTP method names are case-insensitive.
 
-As of ToastStunt 2.7.3 curl supports the Dictionary Server (DICT) protocol.
+| Option | Description |
+| --- | --- |
+| `"method"` | HTTP method string: GET, HEAD, POST, PUT, PATCH, DELETE, or OPTIONS. Defaults to GET, or POST when body or json is supplied. |
+| `"body"` | Request body as a MOO binary string. Cannot be combined with json or an explicit GET, HEAD, or OPTIONS method. |
+| `"json"` | MOO value serialized as the request body using the common-subset mode of `generate_json()`. Sets the Content-Type header to application/json unless that header is supplied in headers. |
+| `"headers"` | Map of request header names to strings or lists of strings. A list sends repeated headers. Invalid names and values raise `E_INVARG`. |
+| `"timeout"` | Time limit in integer seconds, from 1 through `$server_options.curl_max_timeout`. |
+| `"max_size"` | Positive integer limiting the response size in bytes. The effective limit is the smaller of this value and `$server_options.curl_max_response_bytes`. |
+| `"follow_redirects"` | Integer or BOOL controlling redirects. 0 or false disables redirects (default). 1 or true permits up to 5 hops; integers 2 through 20 specify the hop limit. Redirect destinations must use HTTP or HTTPS. |
+| `"parse"` | A true value parses the response body as JSON in common-subset mode, subject to `$server_options.json_max_parse_depth`. |
+| `"full"` | A true value returns `["status" -> INT, "headers" -> MAP, "body" -> value, "url" -> STR]` containing the final response's status code, headers, body, and effective URL. Repeated response headers become lists. The body is a binary string, or the parsed JSON value when parse is true. |
+| `"include_headers"` | A true value prepends raw response headers to the body. Cannot be combined with full or parse. |
+
+Response bodies are MOO binary strings unless parse is true; line breaks appear as `~0A`. Use `decode_binary()` to convert a binary string to a list of lines. Compressed responses are decompressed automatically. The User-Agent header defaults to `ToastStunt/<version>`; specify `"User-Agent"` in the headers map to override it.
+
+`$server_options.curl_timeout` sets the default timeout (60 seconds). `curl_max_timeout` sets the maximum permitted timeout (300 seconds). `curl_max_response_bytes` sets the response size limit (10 MiB). These properties apply to every call and take effect on the next request. The size limit counts decompressed bytes before MOO binary encoding, including raw headers when include_headers is true. The compile-time option `CURL_ALLOWED_METHODS` restricts HTTP methods; a disabled method raises `E_PERM`.
+
+Invalid options or incompatible combinations raise `E_INVARG`. Transfer and response parsing failures return `["error" -> ERR, "message" -> STR]`: `E_QUOTA` for an oversized response, `E_INVARG` for a transfer error or invalid JSON, and `E_INTRPT` for a transfer aborted during shutdown. HTTP status codes such as 404 do not cause an error; set full to a true value to retrieve the status code.
+
+```
+curl("https://example.com/", 1, 30);
+curl("https://example.com/api", ["parse" -> 1, "full" -> 1]);
+curl("https://example.com/api", ["json" -> ["name" -> "Toast"], "parse" -> 1]);
+```
 
 **Function: `url_encode`**
 
@@ -5514,7 +5554,7 @@ suspend -- suspends the current task, and resumes it after at least seconds seco
 
 value `suspend` ([int|float seconds])
 
-Sub-second suspend (IE: 0.1) is possible. If seconds is not provided, the task is suspended indefinitely; such a task can only be resumed by use of the `resume()` function.
+Sub-second suspend (IE: 0.1) is possible. If seconds is not provided, the task is suspended indefinitely; such a task can only be resumed by use of the `resume()` function. This suspension persists across server restarts.
 
 When the task is resumed, it will have a full quota of ticks and seconds. This function is useful for programs that run for a long time or require a lot of ticks. If seconds is negative, then `E_INVARG` is raised. `Suspend()` returns zero unless it was resumed via `resume()`, in which case it returns the second argument given to that function.
 
@@ -6056,7 +6096,11 @@ The specific properties searched for are each described in the appropriate secti
 | task_lag_threshold               | override default task_lag_threshold for handling lagging tasks                                                                                             |
 | finished_tasks_limit             | override default finished_tasks_limit (enables the finished_tasks function and define how many tasks get saved by default)                                 |
 | no_name_lookup                   | override default no_name_lookup (disables automatic DNS name resolution on new connections)                                                                |
+| curl_timeout                     | Default curl() timeout in seconds.                                                                                                                         |
+| curl_max_timeout                 | Maximum explicit curl() timeout in seconds.                                                                                                                |
+| curl_max_response_bytes          | Maximum curl() response size in bytes.                                                                                                                     |
 | max_list_value_bytes             | limit the size, in bytes, of user-constructed lists                                                                                                        |
+| max_map_value_bytes              | Limit the size, in bytes, of user-constructed maps, independently of max_list_value_bytes.                                                                 |
 | max_string_concat                | limit the size of user-constructed strings                                                                                                                 |
 | max_concat_catchable | govern whether violating concat size limits causes out-of-seconds or E_QUOTA error |
 | include_rt_vars                  | include runtime variable data in tracebacks when enabled                                                                                                   |
@@ -6388,7 +6432,12 @@ Network Options
 | DEFAULT_LAG_THRESHOLD    | The number of seconds allowed before a task is considered laggy and triggers `#0:handle_lagging_task`.                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | MAX_LINE_BYTES           | Unceremoniously close connections that send lines exceeding this value to prevent memory allocation panics.                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ONLY_32_BITS             | Switch from 64bits back to 32bits.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| CURL_TIMEOUT | Specify the maximum amount of time a CURL request can take before failing. |
+| CURL_TIMEOUT             | Default curl() timeout in seconds, overridden by `$server_options.curl_timeout`.                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| CURL_MAX_TIMEOUT         | Largest explicit curl() timeout in seconds, overridden by `$server_options.curl_max_timeout`.                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| CURL_MAX_RESPONSE_BYTES  | Maximum buffered curl() response size in bytes, overridden by `$server_options.curl_max_response_bytes`; callers may lower the limit with max_size.                                                                                                                                                                                                                                                                                                                                                                                 |
+| CURL_MAX_REDIRECTS       | Redirect limit when follow_redirects is 1 or true.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| CURL_MAX_REDIRECTS_LIMIT | Largest explicit follow_redirects value.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| CURL_ALLOWED_METHODS     | Comma-separated list of permitted HTTP methods. Disabled methods raise `E_PERM`.                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 #### Running the Server
 

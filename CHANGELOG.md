@@ -1,11 +1,16 @@
 # Changelog for toaststunt-documentation repo
 
-## 2026.06.26
+## 1.2.5 - 2026.11.09
+* Updated `curl()` documentation for request options, JSON responses, and timeout and response-size limits.
+* Updated JSON boolean-key support, anonymous-object restrictions, map-key support, and suspended-task persistence.
+* Added the curl configuration options and `max_map_value_bytes` to the server options reference.
+
+## 1.2.42 - 2026.06.26
 * Corrected remaining decision-free source-audit findings across the manual and function help, including `open_network_connection()`, `queued_tasks()`, `reverse()`, `length()`, hash helpers, object/WAIF lifecycle notes, `sort()`, map helpers, `chr()`, `pcre_replace()`, and `read_http()`.
 * Cleaned up source-audited manual issues including fork syntax, indexed assignment prose, numeric builtin signatures, FileIO notes, server-option names, checkpoint wording, wizard-only usage reporting, and stale examples.
 * Added direct function help entries for source-audited builtin parity gaps: `file_size()`, `file_last_access()`, `file_last_modify()`, `file_last_change()`, `connection_options()`, `unlisten()`, `eval()`, and `server_version()`.
 
-## 2026.06.25
+## 1.2.41 - 2026.06.25
 * Consolidated the repository and manual changelogs into this top-level changelog
 * Moved contributors documentation to the repository root
 * Updated function help for recent ToastStunt 2.7.2, 2.7.3, and 2.8.0 behavior changes
