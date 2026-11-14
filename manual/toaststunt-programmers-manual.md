@@ -2,6 +2,8 @@
 
 ## Written for ToastStunt Version 2.8+
 
+Released behavior is documented through ToastStunt 2.8.0. Notes labeled **ToastStunt 2.8.1 (unreleased)** describe subsequent mainline changes that are not available in the 2.8.0 release.
+
 by Pavel Curtis et al
 
 Copyright © 1991, 1992, 1993, 1995, 1996 by Pavel Curtis.
@@ -882,7 +884,7 @@ All of the usual simple operations on numbers are available to MOO programs:
 %
 ```
 
-These are, in order, addition, subtraction, multiplication, division, and remainder. In the following table, the expressions on the left have the corresponding values on the right:
+These are, in order, addition, subtraction, multiplication, division, and modulus. In the following table, the expressions on the left have the corresponding values on the right:
 
 ```
 5 + 2       =>   7
@@ -892,13 +894,15 @@ These are, in order, addition, subtraction, multiplication, division, and remain
 5.0 / 2.0   =>   2.5
 5 % 2       =>   1
 5.0 % 2.0   =>   1.0
-5 % -2      =>   1
--5 % 2      =>   -1
+5.0 % -2.0  =>   -1.0
+-5.0 % 2.0  =>   1.0
+5 % -2      =>   -1
+-5 % 2      =>   1
 -5 % -2     =>   -1
 -(5 + 2)    =>   -7
 ```
 
-Note that integer division in MOO throws away the remainder and that the result of the remainder operator (`%`) has the same sign as the left-hand operand. Also, note that `-` can be used without a left-hand operand to negate a numeric expression.
+Integer division in MOO truncates toward zero. For integers and floating-point numbers, a nonzero result of the modulus operator (`%`) has the same sign as the right-hand operand (the divisor). Also, note that `-` can be used without a left-hand operand to negate a numeric expression.
 
 Fine point: Integers and floating-point numbers cannot be mixed in any particular use of these arithmetic operators; unlike some other programming languages, MOO does not automatically coerce integers into floating-point numbers. You can use the `tofloat()` function to perform an explicit conversion.
 
@@ -923,7 +927,7 @@ The `+` operator can also be used to append to a list. The expression
 ```
 
 has the value of `{1, 2, #123}`
-Unless both operands to an arithmetic operator are numbers of the same kind (or, for `+`, both strings), the error value `E_TYPE` is raised. If the right-hand operand for the division or remainder operators (`/` or `%`) is zero, the error value `E_DIV` is raised.
+Unless both operands to an arithmetic operator are numbers of the same kind (or, for `+`, both strings), the error value `E_TYPE` is raised. If the right-hand operand for the division or modulus operators (`/` or `%`) is zero, the error value `E_DIV` is raised.
 
 MOO also supports the exponentiation operation, also known as "raising to a power," using the `^` operator:
 
@@ -935,6 +939,8 @@ MOO also supports the exponentiation operation, also known as "raising to a powe
 ```
 
 > Note: if the first operand is an integer, then the second operand must also be an integer. If the first operand is a floating-point number, then the second operand can be either kind of number. Although it is legal to raise an integer to a negative power, it is unlikely to be terribly useful.
+
+> **ToastStunt 2.8.1 (unreleased):** Negative integer powers of `-1` now have the correct sign: `(-1) ^ -1` returns `-1`, and `(-1) ^ -2` returns `1`. ToastStunt 2.8.0 returns the opposite signs for these cases.
 
 #### Bitwise Operators
 
@@ -1496,6 +1502,8 @@ name(expr-1, expr-2, ..., expr-N)
 ```
 
 where name is the name of one of the built-in functions. The expressions between the parentheses, called _arguments_, are each evaluated in turn and then given to the named function to use in its appropriate way. Most functions require that a specific number of arguments be given; otherwise, `E_ARGS` is raised. Most also require that certain of the arguments have certain specified types (e.g., the `length()` function requires a string, list, or map as its argument); `E_TYPE` is raised if any argument has the wrong type.
+
+As of ToastStunt 2.8.0, flag arguments to `isa()`, `locate_by_name()`, `occupants()`, `locations()`, `explode()`, `sort()`, `queued_tasks()`, `switch_player()`, `set_thread_mode()`, `is_member()`, `maphaskey()`, `file_grep()`, and `pcre_match()` accept integers or BOOL values (`true` and `false`). These arguments are written as `INT|BOOL` in the function signatures. Zero and `false` disable a flag; nonzero integers and `true` enable it. `function_info()` reports these argument types as `-3`.
 
 As with list construction, the splicing operator `@` can precede any argument expression. The value of such an expression must be a list; `E_TYPE` is raised otherwise. The elements of this list are passed as individual arguments, in place of the list as a whole.
 
@@ -2703,6 +2711,8 @@ value parse_json (str json [, str mode])
 
 If the specified string is not valid JSON, E_INVARG is raised.
 
+**ToastStunt 2.8.1 (unreleased):** JSON objects with duplicate keys are rejected with `E_INVARG`, including nested objects. Keys are compared as MOO map keys after decoding, so names that differ only in case or collide after decoding escapes or embedded type tags are also rejected. For example, `{"a": 1, "A": 2}` is rejected in either mode; `{"a": 1, "a|str": 2}` is rejected in `"embedded-types"` mode. ToastStunt 2.8.0 silently keeps the first value when such keys collide.
+
 The optional mode controls how JSON strings and object keys are interpreted. In `"common-subset"` mode (the default), they are returned as MOO strings. In `"embedded-types"` mode, type tags are used to reconstruct MOO values; see `generate_json()` for the encoding format.
 
 ```
@@ -3071,7 +3081,7 @@ If str1 is [lexicographically](https://en.wikipedia.org/wiki/Lexicographical_ord
 
 explode -- Returns a list of substrings of subject that are separated by break. break defaults to a space.
 
-list  `explode`(STR subject [, STR break [, INT include-sequential-occurrences]])
+list  `explode`(STR subject [, STR break [, INT|BOOL include-sequential-occurrences]])
 
 Only the first character of `break` is considered:
 
@@ -3240,11 +3250,11 @@ ToastCore offers two primary methods of interacting with regular expressions.
 
 pcre_match -- The function `pcre_match()` searches `subject` for `pattern` using the Perl Compatible Regular Expressions library. ToastStunt uses PCRE2 for this functionality.
 
-LIST `pcre_match`(STR subject, STR pattern [, ?case matters=0] [, ?repeat until no matches=1])
+LIST `pcre_match`(STR subject, STR pattern [, INT|BOOL case matters=0 [, INT|BOOL repeat until no matches=1]])
 
 The return value is a list of maps containing each match. Each returned map will have a key which corresponds to either a named capture group or the number of the capture group being matched. The full match is always found in the key "0". The value of each key will be another map containing the keys 'match' and 'position'. Match corresponds to the text that was matched and position will return the indices of the substring within `subject`.
 
-If `repeat until no matches` is 1, the expression will continue to be evaluated until no further matches can be found or it exhausts the iteration limit. This defaults to 1.
+If `repeat until no matches` is true, the expression will continue to be evaluated until no further matches can be found or it exhausts the iteration limit. This defaults to 1.
 
 Empty patterns raise `E_INVARG`. Empty subjects are valid, but the current implementation returns an empty list without attempting a zero-length match.
 
@@ -3395,6 +3405,8 @@ str `crypt` (str text [, str salt])
 
 Encrypts (hashes) the given text using the standard UNIX encryption method. If provided, salt should be a string at least two characters long, and it may dictate a specific algorithm to use. By default, crypt uses the original, now insecure, DES algorithm. ToastStunt specifically includes the BCrypt algorithm (identified by salts that start with "$2a$"), and may include MD5, SHA256, and SHA512 algorithms depending on the libraries used to build the server. The salt used is returned as the first part of the resulting encrypted string.
 
+As of ToastStunt 2.8.0, if the operating system's `crypt()` implementation reports failure by returning NULL (for example, for a salt setting it rejects), `E_INVARG` is raised.
+
 Aside from the possibly-random input in the salt, the encryption algorithms are entirely deterministic. In particular, you can test whether or not a given string is the same as the one used to produce a given piece of encrypted text; simply extract the salt from the front of the encrypted text and pass the candidate string and the salt to crypt(). If the result is identical to the given encrypted text, then you`ve got a match.
 
 ```
@@ -3522,7 +3534,7 @@ length(["a" -> 1])  =>   1
 
 is_member -- Returns true if there is an element of list that is completely indistinguishable from value.
 
-int `is_member` (ANY value, LIST list [, INT case-sensitive])
+int `is_member` (ANY value, LIST list [, INT|BOOL case-sensitive])
 
 This is much the same operation as " `value in list`" except that, unlike `in`, the `is_member()` function does not treat upper- and lower-case characters in strings as equal. This treatment of strings can be controlled with the `case-sensitive` argument; setting `case-sensitive` to false will effectively disable this behavior.
 
@@ -3668,7 +3680,7 @@ slice({["a" -> 1, "b" -> 2], ["a" -> 5, "b" -> 6], ["b" -> 8]}, "a", 0) => {1, 5
 
 sort -- Sorts list either by keys or using the list itself.
 
-list `sort`(LIST list [, LIST keys, INT natural sort order?, INT reverse])
+list `sort`(LIST list [, LIST keys, INT|BOOL natural sort order?, INT|BOOL reverse])
 
 When sorting list by itself, you can use an empty list ({}) for keys to specify additional optional arguments.
 
@@ -3761,7 +3773,7 @@ When passed a list as the second argument, mapdelete() will now delete multiple 
 
 maphaskey -- Returns 1 if key exists in map. When not dealing with hundreds of keys, this function is faster (and easier to read) than something like: !(x in mapkeys(map))
 
-int `maphaskey` (MAP map, ANY key [, INT case-matters])
+int `maphaskey` (MAP map, ANY key [, INT|BOOL case-matters])
 
 If `case-matters` is true, string-key comparison is case-sensitive. Keys may be integers, floats, strings, object numbers, error values, booleans, WAIFs, or anonymous-object references. Passing a list or map as key raises `E_TYPE`.
 
@@ -3780,6 +3792,8 @@ obj `create` (obj parent [, obj owner] [, int anon-flag] [, list init-args])
 obj `create` (list parents [, obj owner] [, int anon-flag] [, list init-args])
 
 Creates and returns a new object whose parents are parents (or whose parent is parent) and whose owner is as described below. If any of the given parents are not valid, or if the given parent is neither valid nor #-1, then E_INVARG is raised. The given parents objects must be valid and must be usable as a parent (i.e., their `a` or `f` bits must be true) or else the programmer must own parents or be a wizard; otherwise E_PERM is raised. Furthermore, if anon-flag is true then `a` must be true; and, if anon-flag is false or not present, then `f` must be true. Otherwise, E_PERM is raised unless the programmer owns parents or is a wizard. E_PERM is also raised if owner is provided and not the same as the programmer, unless the programmer is a wizard. 
+
+The parent list must not contain duplicate objects. A list such as `{a, b, b}` raises `E_INVARG`. ToastStunt 2.8.0 fixes incomplete duplicate detection in earlier versions.
 
 After the new object is created, its initialize verb, if any, is called. If init-args were given, they are passed as args to initialize. The new object is assigned the least non-negative object number that has not yet been used for a created object. Note that no object number is ever reused, even if the object with that number is recycled.
 
@@ -3834,6 +3848,8 @@ none `chparent` (obj object, obj new-parent)
 
 none `chparents` (obj object, list new-parents)
 
+The parent list must not contain duplicate objects. A list such as `{a, b, b}` raises `E_INVARG`. ToastStunt 2.8.0 fixes incomplete duplicate detection in earlier versions.
+
 If object is not valid, or if new-parent is neither valid nor equal to `#-1`, then `E_INVARG` is raised. If the programmer is neither a wizard or the owner of object, or if new-parent is not fertile (i.e., its `f` bit is not set) and the programmer is neither the owner of new-parent nor a wizard, then `E_PERM` is raised. If new-parent is equal to `object` or one of its current descendants, `E_RECMOVE` is raised. If object or one of its descendants defines a property with the same name as one defined either on new-parent or on one of its ancestors, then `E_INVARG` is raised.
 
 Changing an object's parent can have the effect of removing some properties from and adding some other properties to that object and all of its descendants (i.e., its children and its children's children, etc.). Let common be the nearest ancestor that object and new-parent have in common before the parent of object is changed. Then all properties defined by ancestors of object under common (that is, those ancestors of object that are in turn descendants of common) are removed from object and all of its descendants. All properties defined by new-parent or its ancestors under common are added to object and all of its descendants. As with `create()`, the newly-added properties are given the same permission bits as they have on new-parent, the owner of each added property is either the owner of the object it's added to (if the `c` permissions bit is set) or the owner of that property on new-parent, and the value of each added property is _clear_; see the description of the built-in function `clear_property()` for details. All properties that are not removed or added in the reparenting process are completely unchanged.
@@ -3879,7 +3895,7 @@ list `children` (obj object)
 
 int isa(OBJ object, OBJ parent)
 
-obj isa(OBJ object, LIST parent list [, INT return_parent])
+obj isa(OBJ object, LIST parent list [, INT|BOOL return_parent])
 
 Returns true if object is a descendant of parent, otherwise false.
 
@@ -3896,7 +3912,7 @@ isa(#2, {$thing, $room, $container}, 1) => #-1
 
 locate_by_name -- This function searches every object in the database for those containing `object name` in their .name property.
 
-list `locate_by_name` (STR object name [, INT case-matters])
+list `locate_by_name` (STR object name [, INT|BOOL case-matters])
 
 If `case-matters` is true, string matching is case-sensitive. The programmer must be a wizard, or `E_PERM` is raised.
 
@@ -3904,7 +3920,7 @@ As of ToastStunt 2.8.0, this is not a threaded function.
 
 **Function: `locations`**
 
-list `locations`(OBJ object [, OBJ stop [, INT is-parent]])
+list `locations`(OBJ object [, OBJ stop [, INT|BOOL is-parent]])
 
 Recursively build a list of an object's location, its location's location, and so forth until finally hitting $nothing.
 
@@ -3924,7 +3940,7 @@ If the third argument is true, `stop` is assumed to be a PARENT. And if any of y
 
 **Function: `occupants`**
 
-list `occupants`(LIST objects [, OBJ | LIST parent, INT player flag set, INT inverse-match])
+list `occupants`(LIST objects [, OBJ | LIST parent, INT|BOOL player flag set, INT|BOOL inverse-match])
 
 Iterates through the list of objects and returns those matching a specific set of criteria:
 
@@ -3957,6 +3973,8 @@ After a permanent object is recycled, if the owner of the former object has a pr
 recreate -- Recreate invalid object old (one that has previously been recycle()ed) as parent, optionally owned by owner.
 
 obj `recreate`(OBJ old, OBJ parent [, OBJ owner])
+
+As of ToastStunt 2.8.0, parent must be a valid object or `#-1` (no parent); any other invalid parent raises `E_INVARG`. This validation also applies to wizard callers.
 
 This has the effect of filling in holes created by recycle() that would normally require renumbering and resetting the maximum object.
 
@@ -4434,6 +4452,8 @@ file_read -- Reads up to the specified number of bytes from the file and returns
 
 str `file_read`(FHANDLE fh, INT bytes)
 
+As of ToastStunt 2.8.0, bytes must be positive; zero or a negative value raises `E_INVARG`.
+
 Not recommended for use on files in text mode.
 
 This is implemented using fread().
@@ -4468,7 +4488,7 @@ This rewinds the file and reads to EOF while counting, leaving the stream positi
 
 file_grep -- search for a string in a file
 
-LIST `file_grep`(FHANDLE fh, STR search [,?match_all = 0])
+LIST `file_grep`(FHANDLE fh, STR search [, INT|BOOL match_all = 0])
 
 Assume we have a file `test.txt` with the contents:
 
@@ -5034,7 +5054,7 @@ This function is primarily intended for use when the 'NO_NAME_LOOKUP' server opt
 
 switch_player -- Silently switches the player associated with this connection from object1 to object2.
 
-none `switch_player`(OBJ object1, OBJ object2 [, INT silent])
+none `switch_player`(OBJ object1, OBJ object2 [, INT|BOOL silent])
 
 object1 must be connected and object2 must be a player. This can be used in do_login_command() verbs that read or suspend (which prevents the normal player selection mechanism from working).
 
@@ -5189,6 +5209,8 @@ Response bodies are MOO binary strings unless parse is true; line breaks appear 
 `$server_options.curl_timeout` sets the default timeout (60 seconds). `curl_max_timeout` sets the maximum permitted timeout (300 seconds). `curl_max_response_bytes` sets the response size limit (10 MiB). These properties apply to every call and take effect on the next request. The size limit counts decompressed bytes before MOO binary encoding, including raw headers when include_headers is true. The compile-time option `CURL_ALLOWED_METHODS` restricts HTTP methods; a disabled method raises `E_PERM`.
 
 Invalid options or incompatible combinations raise `E_INVARG`. Transfer and response parsing failures return `["error" -> ERR, "message" -> STR]`: `E_QUOTA` for an oversized response, `E_INVARG` for a transfer error or invalid JSON, and `E_INTRPT` for a transfer aborted during shutdown. HTTP status codes such as 404 do not cause an error; set full to a true value to retrieve the status code.
+
+**ToastStunt 2.8.1 (unreleased):** With `"parse"` enabled, `curl()` rejects duplicate JSON object keys, including case-insensitive collisions and collisions after decoding escapes. It returns an error map containing `"error" -> E_INVARG` and `"message" -> "Response body is not valid JSON"`, even when `"full"` is enabled. ToastStunt 2.8.0 silently keeps the first value for colliding keys. See `parse_json()` for the key comparison rules.
 
 ```
 curl("https://example.com/", 1, 30);
@@ -5394,17 +5416,18 @@ Each function description is a list of the following form:
 {name, min-args, max-args, types}
 ```
 
-where name is the name of the built-in function, min-args is the minimum number of arguments that must be provided to the function, max-args is the maximum number of arguments that can be provided to the function or `-1` if there is no maximum, and types is a list of max-args integers (or min-args if max-args is `-1`), each of which represents the type of argument required in the corresponding position. Each type number is as would be returned from the `typeof()` built-in function except that `-1` indicates that any type of value is acceptable and `-2` indicates that either integers or floating-point numbers may be given. For example, here are several entries from the list:
+where name is the name of the built-in function, min-args is the minimum number of arguments that must be provided to the function, max-args is the maximum number of arguments that can be provided to the function or `-1` if there is no maximum, and types is a list of max-args integers (or min-args if max-args is `-1`), each of which represents the type of argument required in the corresponding position. Each type number is as would be returned from the `typeof()` built-in function except that `-1` indicates that any type of value is acceptable, `-2` indicates that either integers or floating-point numbers may be given, and `-3` indicates that either integers or BOOL values may be given (as of ToastStunt 2.8.0). For example, here are several entries from the list:
 
 ```
 {"listdelete", 2, 2, {4, 0}}
-{"suspend", 0, 1, {0}}
+{"suspend", 0, 1, {-2}}
 {"server_log", 1, 2, {2, -1}}
+{"queued_tasks", 0, 2, {-3, -3}}
 {"max", 1, -1, {-2}}
 {"tostr", 0, -1, {}}
 ```
 
-`listdelete()` takes exactly 2 arguments, of which the first must be a list (`LIST == 4`) and the second must be an integer (`INT == 0`).  `suspend()` has one optional argument that, if provided, must be a number (integer or float). `server_log()` has one required argument that must be a string (`STR == 2`) and one optional argument that, if provided, may be of any type.  `max()` requires at least one argument but can take any number above that, and the first argument must be either an integer or a floating-point number; the type(s) required for any other arguments can't be determined from this description. Finally, `tostr()` takes any number of arguments at all, but it can't be determined from this description which argument types would be acceptable in which positions.
+`listdelete()` takes exactly 2 arguments, of which the first must be a list (`LIST == 4`) and the second must be an integer (`INT == 0`).  `suspend()` has one optional argument that, if provided, must be a number (integer or float). `server_log()` has one required argument that must be a string (`STR == 2`) and one optional argument that, if provided, may be of any type.  `queued_tasks()` has two optional integer-or-BOOL flag arguments. `max()` requires at least one argument but can take any number above that, and the first argument must be either an integer or a floating-point number; the type(s) required for any other arguments can't be determined from this description. Finally, `tostr()` takes any number of arguments at all, but it can't be determined from this description which argument types would be acceptable in which positions.
 
 **Function: `eval`**
 
@@ -5492,7 +5515,7 @@ list `threads`()
 
 int `set_thread_mode`()
 
-none `set_thread_mode`(INT mode)
+none `set_thread_mode`(INT|BOOL mode)
 
 With no arguments specified, set_thread_mode will return the current thread mode for the verb. A value of 1 indicates that threading is enabled for functions that support it. A value of 0 indicates that threading is disabled and all functions will execute in the main MOO thread, as functions have done in default LambdaMOO since version 1.
 
@@ -5619,20 +5642,41 @@ Minimum seconds: The minimum number of seconds the task has left before suspendi
 
 **Function: `queue_info`**
 
-queue_info -- if player is omitted, returns a list of object numbers naming all players that currently have active task queues inside the server
+queue_info -- returns task queue users, counts, or wizard-only queue information
 
-list `queue_info` ([obj player])
-map `queue_info` ([obj player])
+list `queue_info` ()
 
-If player is provided, returns the number of background tasks currently queued for that user. It is guaranteed that `queue_info(X)` will return zero for any X not in the result of `queue_info()`.
+int|map `queue_info` (obj player)
 
-If the caller is a wizard a map of debug information about task queues will be returned.
+With no argument, returns a list of object numbers for all users with task queues. This form returns a list even when the caller is a wizard.
+
+With a player argument, a non-wizard receives the integer count of background tasks queued for that user. A wizard receives a map of queue information. If no queue exists for player, either caller receives 0.
+
+The wizard-only map contains these fields:
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `player` | OBJ | Object associated with the task queue. |
+| `handler` | OBJ | Object handling commands for the connection. |
+| `connected` | BOOL | Whether the queue has an active connection. |
+| `total_input_length` | INT | Length of queued input in bytes. |
+| `last_input_task_id` | INT | ID of the most recent input task, or 0 if none is recorded. |
+| `input_suspended` | BOOL | Whether network input is suspended for the queue. |
+| `usage` | INT | Internal scheduling usage value; a kind of inverted priority. |
+| `num_bg_tasks` | INT | Number of background tasks queued for this user. |
+| `hold_input` | BOOL | Whether ordinary input is held until a task calls read(). |
+| `disable_oob` | BOOL | Whether out-of-band input is treated as ordinary input. |
+| `reading` | BOOL | Whether a task is waiting in read(). |
+| `parsing` | BOOL | Whether a task is waiting in read_http(). |
+| `reading_task_id` | INT | ID of the task waiting in read(), or 0 when reading is false. |
+
+As of ToastStunt 2.8.0, `hold_input` correctly reports the queue's input-holding flag. Earlier versions incorrectly derived it from the scheduling `usage` value.
 
 **Function: `queued_tasks`**
 
 queued_tasks -- returns information on each of the background tasks (i.e., forked, suspended or reading) owned by the programmer (or, if the programmer is a wizard, all queued tasks)
 
-list|int `queued_tasks` ([INT show-runtime-or-count-only [, INT count-only]])
+list|int `queued_tasks` ([INT|BOOL include-runtime [, INT|BOOL count-only]])
 
 The returned value is a list of lists, each of which encodes certain information about a particular queued task in the following format:
 
@@ -5644,9 +5688,11 @@ where task-id is an integer identifier for this queued task, start-time is the t
 
 The x and y fields are now obsolete and are retained only for backward-compatibility reasons. They may be reused for new purposes in some future version of the server.
 
-If exactly one argument is provided and it is true, all variables present in the task are presented in a map with the variable name as the key and its value as the value. Calling `queued_tasks(1)` includes runtime variables; calling `queued_tasks(0)` does not.
+If include-runtime is true, each task entry has an eleventh field: a map from runtime variable names to their values. `queued_tasks(1)` and `queued_tasks(true, false)` include runtime variables; `queued_tasks()` and `queued_tasks(false)` do not.
 
-If two arguments are provided and the second argument is true, then only the number of tasks is returned. This is significantly more performant than length(queued_tasks()). Runtime variables are not included when two arguments are provided, so `queued_tasks(1, 0)` returns the normal task list without runtime variables.
+If count-only is true, only the number of tasks is returned, regardless of include-runtime. For example, `queued_tasks(false, true)` returns an integer count. This is significantly more performant than `length(queued_tasks())`.
+
+As of ToastStunt 2.8.0, include-runtime is honored when two arguments are supplied: `queued_tasks(1, 0)` includes runtime variables. Earlier versions ignored the first argument in the two-argument form.
 
 > Warning: If you are upgrading to ToastStunt from a version of LambdaMOO prior to 1.8.1 you will need to dump your database, reboot into LambdaMOO emergency mode, and kill all your queued_tasks() before dumping the DB again. Otherwise, your DB will not boot into ToastStunt.
 
