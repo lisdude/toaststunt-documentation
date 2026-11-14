@@ -1,5 +1,11 @@
 # Changelog for toaststunt-documentation repo
 
+## 2026.11.14
+* Corrected manual and function help for ToastStunt 2.8.0 runtime-variable flags, boolean flag arguments, FileIO and crypt errors, parent validation, and task queue fields.
+* Added direct `function_info()` help and documented the `-3` integer-or-BOOL argument type; corrected its `suspend()` example.
+* Corrected modulus sign rules and negative-operand examples.
+* Clearly marked duplicate JSON key rejection in `parse_json()` and `curl()` and the negative-power sign fix as ToastStunt 2.8.1 (unreleased), with 2.8.0 compatibility notes.
+
 ## 1.2.5 - 2026.11.09
 * Updated `curl()` documentation for request options, JSON responses, and timeout and response-size limits.
 * Updated JSON boolean-key support, anonymous-object restrictions, map-key support, and suspended-task persistence.
