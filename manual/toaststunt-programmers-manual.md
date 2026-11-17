@@ -154,7 +154,7 @@ For older versions of this document (or for pre-fork LambdaMOO version) please s
 
 01/08/2022
 
-Hi, I'm Brendan aka Slither. I've been coding in MOO on [Sindome](https://www.sindome.org/) since 2003. I have spent many many hours over the years pouring over the original LambdaMOO programmers manual written by Pavel Curtis. In 2016 I set about updating the original manual with some of my learnings and it wasn't until 2019 that I finished work on it. Around the same time I heard about ToastStunt from [lisdude](https://github.com/lisdude). I wanted to get involved, but sadly, my C/++ coding skills are terrible. Thus, I decided my contribution would be to update the programmers guide to include all the changes that Toast has added, as well as further learnings and feedback from lisdude, DistantOrigin, and other members of the ToastStunt Discord server.
+Hi, I'm Brendan aka Slither. I've been coding in MOO on [Sindome](https://www.sindome.org/) since 2003. I have spent many many hours over the years poring over the original LambdaMOO programmers manual written by Pavel Curtis. In 2016 I set about updating the original manual with some of my learnings and it wasn't until 2019 that I finished work on it. Around the same time I heard about ToastStunt from [lisdude](https://github.com/lisdude). I wanted to get involved, but sadly, my C/++ coding skills are terrible. Thus, I decided my contribution would be to update the programmers guide to include all the changes that Toast has added, as well as further learnings and feedback from lisdude, DistantOrigin, and other members of the ToastStunt Discord server.
 
 This guide is not just a technical document, it also contains opinions (mine and others) about what you should (waifs) and shouldn't (anonymous objects, multiple inheritance) consider doing and using. In the end though it's up to you. LambdaMOO and now its successor, ToastStunt, are amazing for creating games, hobby projects, and for tinkering or learning to code. I hope you have some fun!
 
@@ -170,7 +170,7 @@ ToastStunt is a fork of [Stunt](https://github.com/toddsundsted/stunt), which is
 * [Unedited Original MOO Programmers Manual](http://www.hayseed.net/MOO/manuals/ProgrammersManual.html)
 * [Older Unedited MOO Programmers Manual](http://www2.iath.virginia.edu/courses/moo/ProgrammersManual.texinfo_toc.html)
 * [ToastStunt Source (GitHub)](https://github.com/lisdude/toaststunt)
-* [ToastCore Database Repo](https://github.com/lisdude/toastcore) [ToastCore Datbase File](https://raw.githubusercontent.com/lisdude/toastcore/master/toastcore.db)
+* [ToastCore Database Repo](https://github.com/lisdude/toastcore) [ToastCore Database File](https://raw.githubusercontent.com/lisdude/toastcore/master/toastcore.db)
 * [MOO Talk Mailing List](https://groups.google.com/forum/#!forum/MOO-talk)
 * [Dome Client Web Socket MOO Client](https://github.com/JavaChilly/dome-client.js)
 * [MOO FAQ](http://www.moo.mud.org/moo-faq/)
@@ -637,7 +637,7 @@ The next step is to try to find MOO objects that are named by the direct and ind
 
 First, if an object string is empty, then the corresponding object is the special object `#-1` (aka `$nothing` in ToastCore). If an object string has the form of an object number (i.e., a hash mark (`#`) followed by digits), and the object with that number exists, then that is the named object. If the object string is either `"me"` or `"here"`, then the player object itself or its location is used, respectively.
 
-> Note: $nothing is considered a `corified` object.  This means that a _property_ has been created on `#0` named `nothing` with the value of `#-1`. For example (after creating the property): `;#0.nothing = #-1` This allows you to reference the `#-1` object via it's corified reference of `$nothing`. In practice this can be very useful as you can use corified references in your code (and should!) instead of object numbers. Among other benefits this allows you to write your code (which references other objects) once and then swap out the corified reference, pointing to a different object. For instance if you have a new error logging system and you want to replace the old $error_logger reference with your new one, you wont have to find all the references to the old error logger object number in your code. You can just change the property on `#0` to reference the new object.  
+> Note: $nothing is considered a `corified` object.  This means that a _property_ has been created on `#0` named `nothing` with the value of `#-1`. For example (after creating the property): `;#0.nothing = #-1` This allows you to reference the `#-1` object via its corified reference of `$nothing`. In practice this can be very useful as you can use corified references in your code (and should!) instead of object numbers. Among other benefits this allows you to write your code (which references other objects) once and then swap out the corified reference, pointing to a different object. For instance if you have a new error logging system and you want to replace the old $error_logger reference with your new one, you won't have to find all the references to the old error logger object number in your code. You can just change the property on `#0` to reference the new object.  
 
 Otherwise, the server considers all of the objects whose location is either the player (i.e., the objects the player is "holding", so to speak) or the room the player is in (i.e., the objects in the same room as the player); it will try to match the object string against the various names for these objects.
 
@@ -652,7 +652,7 @@ So, now the server has identified a verb string, a preposition string, and direc
 3. the direct object, if any
 4. the indirect object, if any.
 
-For each of these verbs in turn, it tests if all of the the following are true:
+For each of these verbs in turn, it tests if all of the following are true:
 
 * the verb string in the command matches one of the names for the verb
 * the direct- and indirect-object values found by matching are allowed by the corresponding _argument specifiers_    for the verb
@@ -861,7 +861,7 @@ variable = expression
 
 For example, to change the variable named `x` to have the value 17, you would write `x = 17` as an expression. An assignment expression does two things:
 
-* it changes the value of of the named variable
+* it changes the value of the named variable
 * it returns the new value of that variable
 
 Thus, the expression
@@ -1131,7 +1131,7 @@ expression-1[expression-2]
 
 First, expression-1 is evaluated; it must return a list, map, or string (the _sequence_). Then, expression-2 is evaluated and must return an integer (the _index_) or the _key_ in the case of maps. If either of the expressions returns some other type of value, `E_TYPE` is returned.
 
-For lists and strings the index must be between 1 and the length of the sequence, inclusive; if it is not, then `E_RANGE` is raised.  The value of the indexing expression is the index'th element in the sequence. For maps, the key must be present, if it is not, then E_RANGE is raised. Within expression-2 you can use the symbol ^ as an expression returning the index or key of the first element in the sequence and you can use the symbol $ as an expression returning the index or key of the last element in expression-1.
+For lists and strings the index must be between 1 and the length of the sequence, inclusive; if it is not, then `E_RANGE` is raised.  The value of the indexing expression is the index-th element in the sequence. For maps, the key must be present, if it is not, then E_RANGE is raised. Within expression-2 you can use the symbol ^ as an expression returning the index or key of the first element in the sequence and you can use the symbol $ as an expression returning the index or key of the last element in expression-1.
 
 ```
 "fob"[2]                =>  "o"
@@ -1275,7 +1275,7 @@ v = v[1..start - 1] + value + v[end + 1..$]
 
 if v is a string. 
 
-There is no literal representation of the operation if v is a map. In this case the range given by start-index-expr and end-index-expr is removed, and the the values in result-expr are added.
+There is no literal representation of the operation if v is a map. In this case the range given by start-index-expr and end-index-expr is removed, and the values in result-expr are added.
 
 The assignment expression itself returns the value of result-expr.
 
@@ -1905,7 +1905,7 @@ for element in (my_list)
 endfor
 ```
 
-An example that breaks out of hte loop when a specific object in a list is found
+An example that breaks out of the loop when a specific object in a list is found
 
 ```
 my_list = {#13633, #98, #15840, #18657, #22664};
@@ -1941,7 +1941,7 @@ return expression;
 
 When it is executed, execution of the current verb is terminated immediately after evaluating the given expression, if any. The verb-call expression that started the execution of this verb then returns either the value of expression or the integer 0, if no expression was provided.
 
-We could modify the example given above. Imagine a verb called has_object which takes an object (that we want to find) as it's first argument and a list of objects (to search) as it's second argument:
+We could modify the example given above. Imagine a verb called has_object which takes an object (that we want to find) as its first argument and a list of objects (to search) as its second argument:
 
 ```
 {seek_obj, list_of_objects} = args;
@@ -2122,7 +2122,7 @@ endfork
 player:tell("You get out another ball!");
 ```
 
-In this forked example, the ball will be thrown, the task forked for 1 second later and the the final line telling the player they got out another ball will be followed up right after, without having to wait for the trajectory verb to finish running.
+In this forked example, the ball will be thrown, the task forked for 1 second later and the final line telling the player they got out another ball will be followed up right after, without having to wait for the trajectory verb to finish running.
 
 This type of fork cannot be used if the trajectory is required by the code that runs after it. For instance:
 
@@ -3152,7 +3152,7 @@ decode_base64 -- Returns the binary string representation of the supplied Base64
 
 str `decode_base64` (str base64 [, int safe])
 
-Raises E_INVARG if base64 is not a properly-formed Base64 string. If safe is provide and is true, a URL-safe version of Base64 is used (see RFC4648).
+Raises E_INVARG if base64 is not a properly-formed Base64 string. If safe is provided and is true, a URL-safe version of Base64 is used (see RFC4648).
 
 ```
 decode_base64("AAEC")      ⇒    "~00~01~02"
@@ -3165,7 +3165,7 @@ encode_base64 -- Returns the Base64 encoded string representation of the supplie
 
 str `encode_base64` (str binary [, int safe])
 
-Raises E_INVARG if binary is not a properly-formed binary string. If safe is provide and is true, a URL-safe version of Base64 is used (see [RFC4648](https://datatracker.ietf.org/doc/html/rfc4648)).
+Raises E_INVARG if binary is not a properly-formed binary string. If safe is provided and is true, a URL-safe version of Base64 is used (see [RFC4648](https://datatracker.ietf.org/doc/html/rfc4648)).
 
 ```
 encode_base64("~00~01~02")    ⇒    "AAEC"
@@ -3462,7 +3462,7 @@ This is a more secure way to hash passwords than the `crypt()` builtin.
 
 > Warning: It is possible to build the server with the `THREAD_ARGON2` option. This will enable this built-in to run in a background thread and mitigate lag that these functions can cause. However, this comes with some major caveats. `do_login_command` (where you will typically be verifying passwords) cannot be suspended. Since threading implicitly suspends the MOO task, you won't be able to directly use Argon2 in do_login_command. Instead, you'll have to devise a new solution for logins that doesn't directly involve calling Argon2 in do_login_command.
 
-> Note: More information on Argon2 can be found in the [Argon2 Github](https://github.com/P-H-C/phc-winner-argon2).
+> Note: More information on Argon2 can be found in the [Argon2 GitHub](https://github.com/P-H-C/phc-winner-argon2).
 
 **Function: `string_hash`**
 
@@ -3595,7 +3595,7 @@ listinsert(x, 4)      =>   {4, 1, 2, 3}
 
 **Function: `listdelete`**
 
-listdelete -- Returns a copy of list with the indexth element removed.
+listdelete -- Returns a copy of list with the index-th element removed.
 
 list `listdelete` (list list, int index)
 
@@ -3608,7 +3608,7 @@ listdelete(x, 2)   =>   {"foo", "baz"}
 
 **Function: `listset`**
 
-listset -- Returns a copy of list with the indexth element replaced by value.
+listset -- Returns a copy of list with the index-th element replaced by value.
 
 list `listset` (list list, value, int index)
 
@@ -3850,7 +3850,7 @@ none `chparents` (obj object, list new-parents)
 
 The parent list must not contain duplicate objects. A list such as `{a, b, b}` raises `E_INVARG`. ToastStunt 2.8.0 fixes incomplete duplicate detection in earlier versions.
 
-If object is not valid, or if new-parent is neither valid nor equal to `#-1`, then `E_INVARG` is raised. If the programmer is neither a wizard or the owner of object, or if new-parent is not fertile (i.e., its `f` bit is not set) and the programmer is neither the owner of new-parent nor a wizard, then `E_PERM` is raised. If new-parent is equal to `object` or one of its current descendants, `E_RECMOVE` is raised. If object or one of its descendants defines a property with the same name as one defined either on new-parent or on one of its ancestors, then `E_INVARG` is raised.
+If object is not valid, or if new-parent is neither valid nor equal to `#-1`, then `E_INVARG` is raised. If the programmer is neither a wizard nor the owner of object, or if new-parent is not fertile (i.e., its `f` bit is not set) and the programmer is neither the owner of new-parent nor a wizard, then `E_PERM` is raised. If new-parent is equal to `object` or one of its current descendants, `E_RECMOVE` is raised. If object or one of its descendants defines a property with the same name as one defined either on new-parent or on one of its ancestors, then `E_INVARG` is raised.
 
 Changing an object's parent can have the effect of removing some properties from and adding some other properties to that object and all of its descendants (i.e., its children and its children's children, etc.). Let common be the nearest ancestor that object and new-parent have in common before the parent of object is changed. Then all properties defined by ancestors of object under common (that is, those ancestors of object that are in turn descendants of common) are removed from object and all of its descendants. All properties defined by new-parent or its ancestors under common are added to object and all of its descendants. As with `create()`, the newly-added properties are given the same permission bits as they have on new-parent, the owner of each added property is either the owner of the object it's added to (if the `c` permissions bit is set) or the owner of that property on new-parent, and the value of each added property is _clear_; see the description of the built-in function `clear_property()` for details. All properties that are not removed or added in the reparenting process are completely unchanged.
 
@@ -3966,7 +3966,7 @@ The given object is destroyed, irrevocably. The programmer must either own objec
 
 Anonymous objects can also be recycled explicitly. They are marked invalid and cleared once no active references remain.
 
-After a permanent object is recycled, if the owner of the former object has a property named `ownership_quota` and the value of that property is a integer, then `recycle()` treats that value as a _quota_ and increments it by one, storing the result back into the `ownership_quota` property.
+After a permanent object is recycled, if the owner of the former object has a property named `ownership_quota` and the value of that property is an integer, then `recycle()` treats that value as a _quota_ and increments it by one, storing the result back into the `ownership_quota` property.
 
 **Function: `recreate`**
 
@@ -3996,7 +3996,7 @@ list `recycled_objects`()
 
 **Function: `ancestors`**
 
-ancestors -- Return a list of all ancestors of `object` in order ascending up the inheritance hiearchy. If `full` is true, `object` will be included in the list.
+ancestors -- Return a list of all ancestors of `object` in order ascending up the inheritance hierarchy. If `full` is true, `object` will be included in the list.
 
 list `ancestors`(OBJ object [, INT full])
 
@@ -4374,7 +4374,7 @@ The first character must be (r)ead, (w)rite, or (a)ppend.  The second must be '+
 * w- opens the file for writing, truncating if it exists and creating if not.
 * w+ opens the file for reading and writing, truncating if it exists and creating if not.
 * a- opens a file for writing, creates it if it does not exist and positions the stream at the end of the file.
-* a+ opens the file for reading and writing, creates it if does not exist and positions the stream at the end of the file.
+* a+ opens the file for reading and writing, creates it if it does not exist and positions the stream at the end of the file.
 
 The third character is either (t)ext or (b)inary.  In text mode, data is written as-is from the MOO and data read in by the MOO is stripped of unprintable characters.  In binary mode, data is written filtered through the binary-string->raw-bytes conversion and data is read filtered through the raw-bytes->binary-string conversion.  For example, in text mode writing " 1B" means three bytes are written: ' ' Similarly, in text mode reading " 1B" means the characters ' ' '1' 'B' were present in the file.  In binary mode reading " 1B" means an ASCII ESC was in the file.  In text mode, reading an ESC from a file results in the ESC getting stripped.
 
@@ -4722,7 +4722,7 @@ If database handle is invalid, then `E_INVARG` is raised. If the handle still ha
 
 **Function: `sqlite_execute`**
 
-sqlite_execute -- This function will attempt to create and execute the prepared statement query given in query on the database referred to by handle with the values values.
+sqlite_execute -- This function will attempt to create and execute the prepared statement query given in query on the database referred to by handle with the values `values`.
 
 list | str `sqlite_execute`(INT database handle, STR SQL prepared statement query, LIST values)
 
@@ -5044,9 +5044,9 @@ str `connection_name_lookup` (OBJ connection [, INT record_result])
 
 If a hostname can't be resolved, the function simply returns the numeric IP address. Otherwise, it will return the resolved hostname.
 
-If record_result is true, the resolved hostname will be saved with the connection and will overwrite it's existing 'connection_name()'. This means that you can call 'connection_name_lookup()' a single time when a connection is created and then continue to use 'connection_name()' as you always have in the past.
+If record_result is true, the resolved hostname will be saved with the connection and will overwrite its existing 'connection_name()'. This means that you can call 'connection_name_lookup()' a single time when a connection is created and then continue to use 'connection_name()' as you always have in the past.
 
-This function is primarily intended for use when the 'NO_NAME_LOOKUP' server option is set. Barring temporarily failures in your nameserver, very little will be gained by calling this when the server is performing DNS name lookups for you.
+This function is primarily intended for use when the 'NO_NAME_LOOKUP' server option is set. Barring temporary failures in your nameserver, very little will be gained by calling this when the server is performing DNS name lookups for you.
 
 > Note: This function runs in a separate thread. While this is good for performance (long lookups won't lock your MOO like traditional pre-2.6.0 name lookups), it also means it will require slightly more work to create an entirely in-database DNS lookup solution. Because it explicitly suspends, you won't be able to use it in 'do_login_command()' without also using the 'switch_player()' function. For an example of how this can work, see '#0:do_login_command()' in ToastCore.
 
@@ -5075,7 +5075,7 @@ Raises E_INVARG if conn does not specify a current connection and E_PERM if the 
 `"binary"`
 When set, the connection is in binary mode, in which case both input from and output to conn can contain arbitrary bytes. Input from a connection in binary mode is not broken into lines at all; it is delivered to either the read() function or normal command parsing as binary strings, in whatever size chunks come back from the operating system. (See fine point on binary strings, for a description of the binary string representation.) For output to a connection in binary mode, the second argument to `notify()` must be a binary string; if it is malformed, E_INVARG is raised.
 
-> Fine point: If the connection mode is changed at any time when there is pending input on the connection, said input will be delivered as per the previous mode (i.e., when switching out of binary mode, there may be pending “lines” containing tilde-escapes for embedded linebreaks, tabs, tildes and other characters; when switching into binary mode, there may be pending lines containing raw tabs and from which nonprintable characters have been silently dropped as per normal mode. Only during the initial invocation of $do_login_command() on an incoming connection or immediately after the call to open_network_connection() that creates an outgoing connection is there guaranteed not to be pending input. At other times you will probably want to flush any pending input immediately after changing the connection mode. 
+> Fine point: If the connection mode is changed at any time when there is pending input on the connection, said input will be delivered as per the previous mode (i.e., when switching out of binary mode, there may be pending “lines” containing tilde-escapes for embedded line breaks, tabs, tildes and other characters; when switching into binary mode, there may be pending lines containing raw tabs and from which nonprintable characters have been silently dropped as per normal mode. Only during the initial invocation of $do_login_command() on an incoming connection or immediately after the call to open_network_connection() that creates an outgoing connection is there guaranteed not to be pending input. At other times you will probably want to flush any pending input immediately after changing the connection mode.
 
 `"hold-input"`
 
@@ -5248,7 +5248,7 @@ If parsing fails because the request or response is syntactically incorrect, rea
 
  > Fine point: read_http() assumes the input strings are binary strings. When called interactively, as in the example below, the programmer must insert the literal line terminators or parsing will fail. 
 
-The following example interactively reads an HTTP request from the players connection.
+The following example interactively reads an HTTP request from the player's connection.
 
 ```
 read_http("request", player)
@@ -5263,7 +5263,7 @@ In this example, the string ~0D~0A ends the request. The call returns the follow
 ["headers" -> ["Host" -> "example.com"], "method" -> "GET", "uri" -> "/path"]
 ```
 
-The following example interactively reads an HTTP response from the players connection.
+The following example interactively reads an HTTP response from the player's connection.
 
 ```
 read_http("response", player)
@@ -5358,7 +5358,7 @@ ftime -- Returns the current time represented as the number of seconds and nanos
 
 float `ftime` ([INT monotonic])
 
-If the `monotonic` argument is supplied and set to 1, the time returned will be monotonic. This means that will you will always get how much time has elapsed from an arbitrary, fixed point in the past that is unaffected by clock skew or other changes in the wall-clock. This is useful for benchmarking how long an operation takes, as it's unaffected by the actual system time.
+If the `monotonic` argument is supplied and set to 1, the time returned will be monotonic. This means that you will always get how much time has elapsed from an arbitrary, fixed point in the past that is unaffected by clock skew or other changes in the wall-clock. This is useful for benchmarking how long an operation takes, as it's unaffected by the actual system time.
 
 The general rule of thumb is that you should use ftime() with no arguments for telling time and ftime() with the monotonic clock argument for measuring the passage of time.
 
@@ -5529,7 +5529,7 @@ Note that the threading mode affects the current verb only and does NOT affect v
 
 void `thread_pool`(STR function, STR pool [, INT value])
 
-This function allows you to control any thread pools that the server created at startup. It should be used with care, as it has the potential to create disasterous consequences if used incorrectly.
+This function allows you to control any thread pools that the server created at startup. It should be used with care, as it has the potential to create disastrous consequences if used incorrectly.
 
 The function parameter is the function you wish to perform on the thread pool. The functions available are:
 
@@ -5781,7 +5781,7 @@ With no arguments, this returns the plain server version string. With a non-stri
 
 **Function: `load_server_options`**
 
-load_server_options -- This causes the server to consult the current values of properties on $server_options, updating the corresponding serveroption settings
+load_server_options -- This causes the server to consult the current values of properties on $server_options, updating the corresponding server option settings
 
 none `load_server_options` ()
 
@@ -6204,7 +6204,7 @@ where success is true if and only if the checkpoint was successfully written on 
 
 #### Accepting and Initiating Network Connections
 
-When the server first accepts a new, incoming network connection, it is given the low-level network address of computer on the other end. It immediately attempts to convert this address into the human-readable host name that will be entered in the server log and returned by the `connection_name()` function. This conversion can, for the TCP/IP networking configurations, involve a certain amount of communication with remote name servers, which can take quite a long time and/or fail entirely. While the server is doing this conversion, it is not doing anything else at all; in particular, it it not responding to user commands or executing MOO tasks.
+When the server first accepts a new, incoming network connection, it is given the low-level network address of computer on the other end. It immediately attempts to convert this address into the human-readable host name that will be entered in the server log and returned by the `connection_name()` function. This conversion can, for the TCP/IP networking configurations, involve a certain amount of communication with remote name servers, which can take quite a long time and/or fail entirely. While the server is doing this conversion, it is not doing anything else at all; in particular, it is not responding to user commands or executing MOO tasks.
 
 By default, the server attempts this name lookup for new connections. If `$server_options.no_name_lookup` is true, automatic DNS name resolution is disabled and the server uses a printable representation of the low-level address instead.
 
@@ -6309,7 +6309,7 @@ Whenever the server is booted, there are a few tasks it runs right at the beginn
 
 First, the server calls $do_start_script() and passes in script content via the args built-in variable. The script content is specified on the command line when the server is started. The server can call this verb multiple times, once each for the -c and -f command line arguments.
 
-Next, the server calls $user_disconnected() once for each user who was connected at the time the database file was written; this allows for any cleaning up that`s usually done when users disconnect (e.g., moving their player objects back to some `home` location, etc.).
+Next, the server calls $user_disconnected() once for each user who was connected at the time the database file was written; this allows for any cleaning up that's usually done when users disconnect (e.g., moving their player objects back to some `home` location, etc.).
 
 Next, it checks for the existence of the verb $server_started(). If there is such a verb, then the server runs a task invoking that verb with no arguments and with player equal to #-1. This is useful for carefully scheduling checkpoints and for re-initializing any state that is not properly represented in the database file (e.g., re-opening certain outbound network connections, clearing out certain tables, etc.). 
 
